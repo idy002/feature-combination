@@ -11,7 +11,7 @@ class Config:
     data_path = _data_path
     data_name = _data_name
     num_fields = _dataset.num_fields
-    target_num_fields = 2
+    target_num_fields = 3
     #   learning rate
     lr = 0.001
     #   the discount factor in G
@@ -19,11 +19,11 @@ class Config:
     #   the weight of value function approximation in total loss
     value_scale = 0.5
     #   batch size used in Reinforce algorithm
-    reinforce_batch_size = 3
+    reinforce_batch_size = 20
     #   tensorboard writer target directory
     summaries_dir = "./summaries"
     #   save model in this directory
-    model_dir = "./checkpoints"
+    model_dir = "./checkpoints/model.ckpt"
     # save periods
     save_periods = 100
 

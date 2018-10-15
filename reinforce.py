@@ -13,7 +13,7 @@ class Reinforce:
         self.Y = tf.placeholder(tf.int32, (None,), "action")
         self.R = tf.placeholder(tf.float32, (None,), "reward")
         self.DR = tf.placeholder(tf.float32, (None,), "discounted_reward")
-        self.N = tf.placeholder(tf.int32, (None,), "num_episode")
+        self.LR = tf.placeholder(tf.float32, (None,), "last_reward")
 
         #   define losses
         self.policy_gradient_loss = tf.reduce_mean((self.DR - self.agent.value)
@@ -36,12 +36,13 @@ class Reinforce:
 
         #   setup tensorboard writer
         self.writer = tf.summary.FileWriter(Config.summaries_dir)
+        tf.summary.scalar("mean last reward", tf.reduce_mean(self.LR))
         tf.summary.scalar("total loss", self.loss)
         tf.summary.scalar("policy gradient loss", self.policy_gradient_loss)
         tf.summary.scalar("value loss", self.value_loss)
         self.write_op = tf.summary.merge_all()
 
-        self.saver = tf.train.Saver(tf.global_variables(), save_relative_paths="./checkpoints")
+        self.saver = tf.train.Saver(tf.global_variables())
 
     @staticmethod
     def discount(gamma, rewards):
@@ -72,7 +73,7 @@ class Reinforce:
             num_episodes += 1
             discounted_rewards.append(self.discount(Config.gamma, rewards))
             last_rewards.append(rewards[-1])
-        return np.stack(states), np.stack(actions), np.concatenate(discounted_rewards), last_rewards, num_episodes
+        return np.stack(states), np.stack(actions), np.concatenate(discounted_rewards), np.array(last_rewards), num_episodes
 
     def load(self, model_dir):
         saver = tf.train.Saver(tf.global_variables())
@@ -95,6 +96,7 @@ class Reinforce:
             # gather training data
             states, actions, discounted_rewards, last_rewards, num_episodes = \
                 self.next_batch(Config.reinforce_batch_size, False)
+
             mean_last_rewards = np.mean(last_rewards)
             tot_mean_last_rewards.append(mean_last_rewards)
 
@@ -104,11 +106,11 @@ class Reinforce:
                     num_episodes, mean_last_rewards, np.mean(tot_mean_last_rewards)))
 
             # update network
-            self.sess.run(self.train_op, feed_dict={self.agent.X: states, self.Y: actions, self.DR: discounted_rewards})
+            self.sess.run(self.train_op, feed_dict={self.agent.X: states, self.Y: actions, self.DR: discounted_rewards, self.LR:last_rewards})
 
             # write summaries
             summary = self.sess.run(self.write_op,
-                                    feed_dict={self.agent.X: states, self.Y: actions, self.DR: discounted_rewards})
+                                    feed_dict={self.agent.X: states, self.Y: actions, self.DR: discounted_rewards, self.LR:last_rewards})
             self.writer.add_summary(summary, step)
             self.writer.flush()
 
