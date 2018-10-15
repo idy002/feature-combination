@@ -59,7 +59,7 @@ class Environment:
             y_all.append(y)
         X_all, y_all = np.concatenate(X_all), np.concatenate(y_all)
         reward = model.score(X_all, y_all)
-        print("fields: {} reward: {}".format(state2, reward))
+        #print("fields: {} reward: {}".format(state2, reward))
         return state2, reward
 
 
