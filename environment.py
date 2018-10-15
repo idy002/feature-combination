@@ -31,9 +31,6 @@ class Environment:
                 nX[i, sum] = 1
             yield nX, y
 
-    def evaluate(self, fields):
-        pass
-
     #
     #   compute the reward of a filed combination
     #     - state: one hot state that express the current fields combination
@@ -44,8 +41,12 @@ class Environment:
     def get_reward(self, state, action):
         state2 = np.array(state, np.int32)
         state2[action] = 1
+        
+        if np.sum(state2) < Config.target_num_fields :
+            return state2, 0.0
+
         self.iter_fields = np.concatenate(np.argwhere(state2))
-        model = LogisticRegression()
+        model = LogisticRegression(solver='lbfgs')
         X_all, y_all = [], []
         for X, y in self.batch_generator(gen_type='train', batch_size=10, on_disk=False):
             X_all.append(X)
@@ -59,7 +60,7 @@ class Environment:
             y_all.append(y)
         X_all, y_all = np.concatenate(X_all), np.concatenate(y_all)
         reward = model.score(X_all, y_all)
-        print("fields: {} reward: {}".format(state2, reward))
+        # print("fields: {} reward: {}".format(state2, reward))
         return state2, reward
 
 

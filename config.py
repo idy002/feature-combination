@@ -1,4 +1,4 @@
-_data_path = "/home/yyding/PycharmProjects/Ads-RecSys-Datasets"
+_data_path = "/home/yyding/Repositories/Ads-RecSys-Datasets"
 _data_name = "Couple"
 import sys
 sys.path.append(_data_path)
@@ -28,3 +28,6 @@ class Config:
     save_periods = 100
 
     gradient_clip = 40
+
+    #   epoch display periods
+    epoch_display_periods = 10

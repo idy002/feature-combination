@@ -93,13 +93,15 @@ class Reinforce:
         tot_mean_last_rewards = []
         for step in range(num_steps):
             # gather training data
-            print('Epoch', step)
             states, actions, discounted_rewards, last_rewards, num_episodes = \
                 self.next_batch(Config.reinforce_batch_size, False)
             mean_last_rewards = np.mean(last_rewards)
             tot_mean_last_rewards.append(mean_last_rewards)
-            print('Trained episodes: {}  Mean Last Reward: {:4.2f}  Total Average: {:4.2f}'.format(
-                num_episodes, mean_last_rewards, np.mean(tot_mean_last_rewards)))
+
+            if step % Config.epoch_display_periods == 0:
+                print('Epoch {} {:2.1f}'.format(step, (step + 1.0) / num_steps))
+                print('Trained episodes: {}  Mean Last Reward: {:4.2f}  Total Average: {:4.2f}'.format(
+                    num_episodes, mean_last_rewards, np.mean(tot_mean_last_rewards)))
 
             # update network
             self.sess.run(self.train_op, feed_dict={self.agent.X: states, self.Y: actions, self.DR: discounted_rewards})
@@ -110,6 +112,6 @@ class Reinforce:
             self.writer.add_summary(summary, step)
             self.writer.flush()
 
-            if (step + 1) % Config.save_periods == 0:
-                print("Saved Model")
-                self.saver.save(self.sess, Config.model_dir, global_step=step)
+            # if (step + 1) % Config.save_periods == 0:
+            #     print("Saved Model")
+            #     self.saver.save(self.sess, Config.model_dir, global_step=step)
