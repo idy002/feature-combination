@@ -19,11 +19,11 @@ class Config:
     #   the weight of value function approximation in total loss
     value_scale = 0.5
     #   batch size used in Reinforce algorithm
-    reinforce_batch_size = 20
+    reinforce_batch_size = 100
     #   tensorboard writer target directory
     summaries_dir = "./summaries"
     #   save model in this directory
-    model_dir = "./checkpoints/model.ckpt"
+    model_dir = "checkpoints"
     # save periods
     save_periods = 100
 

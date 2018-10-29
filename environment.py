@@ -4,6 +4,7 @@ import sys
 sys.path.append(Config.data_path)
 from datasets import as_dataset
 import numpy as np
+import itertools # for combinations
 from functools import reduce
 from sklearn.linear_model import LogisticRegression
 
@@ -31,6 +32,32 @@ class Environment:
                 nX[i, sum] = 1
             yield nX, y
 
+    def get_state_reward(self, state):
+        reward_type = ["hit", "acc"][1]
+        if reward_type == "hit":
+            return self.check_hit(state)
+        else :
+            if np.sum(state) < Config.target_num_fields :
+                return 0.0
+
+            self.iter_fields = np.concatenate(np.argwhere(state))
+            model = LogisticRegression(solver='lbfgs')
+            X_all, y_all = [], []
+            for X, y in self.batch_generator(gen_type='train', batch_size=10000, on_disk=False):
+                X_all.append(X)
+                y_all.append(y)
+            X_all, y_all = np.concatenate(X_all), np.concatenate(y_all)
+            model.fit(X_all, y_all)
+
+            X_all, y_all = [], []
+            for X, y in self.batch_generator(gen_type='test', batch_size=10000, on_disk=False):
+                X_all.append(X)
+                y_all.append(y)
+            X_all, y_all = np.concatenate(X_all), np.concatenate(y_all)
+            reward = model.score(X_all, y_all)
+            # print("fields: {} reward: {}".format(state, reward))
+            return reward
+
     #
     #   compute the reward of a filed combination
     #     - state: one hot state that express the current fields combination
@@ -41,36 +68,19 @@ class Environment:
     def get_reward(self, state, action):
         state2 = np.array(state, np.int32)
         state2[action] = 1
-        
-        if np.sum(state2) < Config.target_num_fields :
-            return state2, 0.0
+        return state2, self.get_state_reward(state2)
 
-        self.iter_fields = np.concatenate(np.argwhere(state2))
-        model = LogisticRegression(solver='lbfgs')
-        X_all, y_all = [], []
-        for X, y in self.batch_generator(gen_type='train', batch_size=10, on_disk=False):
-            X_all.append(X)
-            y_all.append(y)
-        X_all, y_all = np.concatenate(X_all), np.concatenate(y_all)
-        model.fit(X_all, y_all)
-
-        X_all, y_all = [], []
-        for X, y in self.batch_generator(gen_type='test', batch_size=10, on_disk=False):
-            X_all.append(X)
-            y_all.append(y)
-        X_all, y_all = np.concatenate(X_all), np.concatenate(y_all)
-        reward = model.score(X_all, y_all)
-        # print("fields: {} reward: {}".format(state2, reward))
-        return state2, reward
-
+    def check_hit(self, state):
+        if isinstance(state,list):
+            return 1.0 if state in self.dataset.all_fc else 0.0
+        else :
+            return 1.0 if np.where(state)[0].tolist() in self.dataset.all_fc else 0.0
 
 if __name__ == "__main__":
     env = Environment()
-    for i in range(Config.num_fields):
-        for j in range(Config.num_fields):
-            if i == j:
-                continue
-            state = [0, 0, 0, 0]
-            state[i] = 1
-            action = j
-            print(env.get_reward(state, action))
+    print(env.dataset.all_fc)
+    for c in itertools.combinations(range(env.dataset.num_fields), Config.target_num_fields):
+        state = np.zeros(env.dataset.num_fields, dtype=np.int)
+        state[np.array(c)] = 1
+        print("{:1.0} {} {}".format(env.check_hit(state), state, env.get_state_reward(state)))
+

@@ -7,13 +7,15 @@ class Agent:
         self.X = tf.placeholder(tf.int32, (None,Config.num_fields), "X")
         self.hide1 = tf.layers.dense(
             inputs = tf.to_float(self.X, "ToFloat"),
-            units = Config.num_fields * 5,
+            units = Config.num_fields * 10,
             activation = tf.nn.relu,
+            kernel_initializer = tf.glorot_normal_initializer(),
             name = "hide1")
         self.hide2 = tf.layers.dense(
             inputs = self.hide1,
-            units = Config.num_fields * 3,
+            units = Config.num_fields * 4,
             activation = tf.nn.relu,
+            kernel_initializer = tf.glorot_normal_initializer(),
             name = "hide2")
         self.logits = tf.layers.dense(
             inputs = self.hide2,
