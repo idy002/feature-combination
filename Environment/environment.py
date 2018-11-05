@@ -1,17 +1,14 @@
-from config import Config
-import sys
-
-sys.path.append(Config.data_path)
 from datasets import as_dataset
+from config import Config
 import numpy as np
-import itertools # for combinations
+import itertools  # for combinations
 from functools import reduce
 from sklearn.linear_model import LogisticRegression
 
 
 class Environment:
     def __init__(self):
-        self.dataset = as_dataset(Config.data_name, False)
+        self.dataset = Config.dataset
         self.field_sizes = self.dataset.feat_sizes
         self.iter_fields = range(self.dataset.num_fields)
 
@@ -36,8 +33,8 @@ class Environment:
         reward_type = ["hit", "acc"][1]
         if reward_type == "hit":
             return self.check_hit(state)
-        else :
-            if np.sum(state) < Config.target_num_fields :
+        else:
+            if np.sum(state) < Config.target_num_fields:
                 return 0.0
 
             self.iter_fields = np.concatenate(np.argwhere(state))
@@ -71,10 +68,11 @@ class Environment:
         return state2, self.get_state_reward(state2)
 
     def check_hit(self, state):
-        if isinstance(state,list):
-            return 1.0 if state in self.dataset.all_fc else 0.0
-        else :
-            return 1.0 if np.where(state)[0].tolist() in self.dataset.all_fc else 0.0
+        if isinstance(state, list):
+            return 1.0 if state in Config.meta["field_combinations"] else 0.0
+        else:
+            return 1.0 if np.where(state)[0].tolist() in self.dataset.meta["field_combinations"] else 0.0
+
 
 if __name__ == "__main__":
     env = Environment()
@@ -83,4 +81,3 @@ if __name__ == "__main__":
         state = np.zeros(env.dataset.num_fields, dtype=np.int)
         state[np.array(c)] = 1
         print("{:1.0} {} {}".format(env.check_hit(state), state, env.get_state_reward(state)))
-

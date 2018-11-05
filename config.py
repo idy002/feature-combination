@@ -1,33 +1,44 @@
-_data_path = "/home/yyding/Repositories/Ads-RecSys-Datasets"
-_data_name = "Couple"
-import sys
-sys.path.append(_data_path)
 from datasets import as_dataset
 
 
 class Config:
-    _dataset = as_dataset(_data_name, False)
 
-    data_path = _data_path
-    data_name = _data_name
-    num_fields = _dataset.num_fields
-    target_num_fields = 3
-    #   learning rate
-    lr = 0.001
-    #   the discount factor in G
-    gamma = 0.5
-    #   the weight of value function approximation in total loss
-    value_scale = 0.5
-    #   batch size used in Reinforce algorithm
-    reinforce_batch_size = 100
-    #   tensorboard writer target directory
-    summaries_dir = "./summaries"
-    #   save model in this directory
-    model_dir = "checkpoints"
-    # save periods
-    save_periods = 100
+    #
+    #   general config
+    #
+    epoch_display_periods = 10  # epoch display periods
+    summaries_dir = "./summaries"  # tensorboard writer target directory
+    model_dir = "checkpoints"  # save model in this directory
+    save_periods = 100  # save periods
 
-    gradient_clip = 40
+    #
+    #   actor config
+    #
+    lr = 0.001  # learning rate
+    gamma = 0.5  # the discount factor in G
+    value_scale = 0.5  # the weight of value function approximation in total loss
+    reinforce_batch_size = 100  # batch size used in Reinforce algorithm
+    gradient_clip = 40  # graient clip, avoid too large gradient
 
-    #   epoch display periods
-    epoch_display_periods = 10
+    #
+    #   encoder config
+    #
+
+    #
+    #   evaluator configs
+    #
+    evaluator_model_name = "lr"
+    evaluator_optimizer_name = 'adam'
+    evaluator_learning_rate = 0.001
+    evaluator_epsilon = 1e-6
+
+
+    #
+    #   dataset
+    #
+    data_name = "Couple"
+    dataset = as_dataset(data_name, False)
+    num_fields = dataset.num_fields
+    meta = dataset.meta
+    target_field_combinations = len(meta["field_combinations"])
+    target_field_len = meta["lens_fc"][0]

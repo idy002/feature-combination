@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from config import Config
 from agent import Agent
-from environment import Environment
+from Environment.environment import Environment
 
 
 class Reinforce:
@@ -65,7 +65,7 @@ class Reinforce:
         while len(states) < batch_size:
             rewards = []
             state = np.zeros(Config.num_fields)
-            while np.sum(state) < Config.target_num_fields:
+            while np.sum(state) < Config.target_field_len:
                 action = self.sess.run(self.agent.action, feed_dict={self.agent.X: state.reshape((1, -1))})
                 action = action[0][0]
 
