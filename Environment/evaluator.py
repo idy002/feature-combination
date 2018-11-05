@@ -1,5 +1,7 @@
 from config import Config
 from Environment.models import as_model
+import time
+import sklearn
 import numpy as np
 import tensorflow as tf
 
@@ -18,13 +20,11 @@ def get_optimizer(name, lr):
 
 class Evaluator:
     def __init__(self):
-        self.data_gen_kwargs = dict()
-        self.data_gen_kwargs["random_sample"] = True
-        self.data_gen_kwargs["val_ratio"] = 0.25
+        # raw dataset information
         self.raw_feat_sizes = Config.dataset.feat_sizes
         self.raw_feat_min = Config.dataset.feat_min
 
-        # datainfo
+        # dataset information
         self.state = None
         self.feat_min = None
         self.feat_sizes = None
@@ -46,19 +46,28 @@ class Evaluator:
         self.train_gen = None
         self.valid_gen = None
 
+        # train and evaluate
+        self.start_time = None
+        self.train_writer = None
+        self.valid_writer = None
+        self.test_writer = None
+
     def build_graph(self):
         self.graph = tf.Graph()
         self.sess = tf.Session(graph=self.graph)
         with self.graph.as_default():
             self.global_step = tf.get_variable('global_step', dtype=tf.int32, initializer=0)
-            self.learning_rate = tf.get_variable('learning_rate', dtype=tf.float32, initializer=Config.evaluator_learning_rate)
+            self.learning_rate = tf.get_variable('learning_rate', dtype=tf.float32,
+                                                 initializer=Config.evaluator_learning_rate)
             self.optimizer = get_optimizer(Config.evaluator_optimizer_name, lr=self.learning_rate)
             self.model = as_model(Config.evaluator_model_name, input_dim=self.num_features, num_fields=self.num_fields)
             self.gradients = self.optimizer.compute_gradients(self.model.loss)
             self.train_op = self.optimizer.minimize(self.model.loss, global_step=self.global_step)
             self.saver = tf.train.Saver()
+            self.train_writer = tf.summary.FileWriter(Config.evaluator_train_logdir, graph=self.graph, flush_secs=10.0)
+            self.valid_writer = tf.summary.FileWriter(Config.evaluator_valid_logdir, graph=self.graph, flush_secs=10.0)
 
-    def init(self, state):
+    def init_dataset(self, state):
         # init the data information
         self.state = state
         self.feat_min = []
@@ -73,8 +82,8 @@ class Evaluator:
             cur_index += size
         self.num_features = cur_index
         self.num_fields = state.shape[0]
-        # build the model
-        self.build_graph()
+        self.train_gen = self.batch_generator(gen_type="train", batch_size=100)
+        self.valid_gen = self.batch_generator(gen_type="valid", batch_size=100)
 
     def print_datainfo(self):
         print("state:")
@@ -97,68 +106,130 @@ class Evaluator:
         return nX
 
     def batch_generator(self, gen_type, batch_size):
-        self.data_gen_kwargs["gen_type"] = gen_type
-        self.data_gen_kwargs["batch_size"] = batch_size
+        data_gen_kwargs = dict()
+        data_gen_kwargs["random_sample"] = True
+        data_gen_kwargs["val_ratio"] = 0.25
+        data_gen_kwargs["gen_type"] = gen_type
+        data_gen_kwargs["batch_size"] = batch_size
         if gen_type == 'train':
-            raw_batch_generator = Config.dataset.batch_generator(self.data_gen_kwargs)
+            raw_batch_generator = Config.dataset.batch_generator(data_gen_kwargs)
             for X, y in raw_batch_generator:
-                yield self.transformX(X), y
+                yield self.transformX(X), np.reshape(y, [-1, 1])
         elif gen_type == 'valid':
-            raw_batch_generator = Config.dataset.batch_generator(self.data_gen_kwargs)
+            raw_batch_generator = Config.dataset.batch_generator(data_gen_kwargs)
             for X, y in raw_batch_generator:
-                yield self.transformX(X), y
+                yield self.transformX(X), np.reshape(y, [-1, 1])
         else:
             assert False, "Unknown gen_type"
 
-    def train_batch(self, batch_X, batch_y):
+    def train_batch(self, batch_xs, batch_ys):
         fetches = [self.train_op, self.model.loss, self.model.log_loss, self.model.l2_loss]
-        feed_dict = {self.model.inputs:batch_X, self.model.labels:batch_y, self.model.training:True}
+        feed_dict = {self.model.inputs: batch_xs, self.model.labels: batch_ys, self.model.training: True}
         _, loss, log_loss, l2_loss = self.sess.run(fetches, feed_dict)
         return loss, log_loss, l2_loss
 
-    def score(self, state, max_step=10000):
-        self.init(state)
-        self.train_gen = self.batch_generator(gen_type="train")
-        self.valid_gen = self.batch_generator(gen_type="valid")
-        step = 0
-        self.sess.run(tf.global_variables_initializer())
-        while (max_step is None) or step < max_step:
-            pass
+    def get_elapsed(self):
+        return time.time() - self.start_time
 
+    '''
+    train the model given the specified state, use auc as the performance. 
+    '''
+
+    def train(self, state, max_rounds=100, log_step_frequency=10, eval_round_frequency=1, early_stop_rounds=3,
+              render=True):
+        with self.graph.as_default():
+            self.train_gen = self.batch_generator(gen_type="train", batch_size=1000)
+            step = 0
+            round = 0
+            self.sess.run(tf.global_variables_initializer())
+            self.start_time = time.time()
+            all_auc = []
+            while round < max_rounds:
+                print("Round: {}".format(step))
+                for batch_xs, batch_ys in self.train_gen:
+                    loss, log_loss, l2_loss = self.train_batch(batch_xs, batch_ys)
+                    step = self.sess.run(self.global_step)
+                    if render and step % log_step_frequency == 0:
+                        print("Done step {:2d}, Elapsed: {:.3f} seconds, Loss: {:.3f}, Log-Loss: {:.3f}, L2-Loss: {:.3f}"
+                              .format(step, self.get_elapsed(), loss, log_loss, l2_loss))
+                        summary = tf.Summary(value=[tf.Summary.Value(tag='loss', simple_value=loss),
+                                                    tf.Summary.Value(tag='log_loss', simple_value=log_loss),
+                                                    tf.Summary.Value(tag='l2_loss', simple_value=l2_loss)])
+                        self.train_writer.add_summary(summary, global_step=step)
+                if round % eval_round_frequency == 0:
+                    log_loss, auc = self.evaluate(self.valid_gen, self.valid_writer)
+                    if render:
+                        print("Round {:2d}, Elapsed: {:.3f} seconds, Log-Loss: {:.3f}, Auc: {:.3f}"
+                              .format(round, self.get_elapsed(), log_loss, auc))
+                    all_auc.append(auc)
+                    max_auc = max(all_auc)
+                    if max(all_auc[-early_stop_rounds:]) < max_auc:
+                        print("earlier stop!")
+                        return
+                round += 1
+
+    def evaluate_batch(self, batch_xs, batch_ys):
+        fetches = self.model.preds
+        feed_dict = {self.model.inputs: batch_xs, self.model.labels: batch_ys, self.model.training: False}
+        return self.sess.run(fetches=fetches, feed_dict=feed_dict)
+
+    '''
+    return log_loss, auc
+    '''
+
+    def evaluate(self, gen, writer):
+        labels = []
+        preds = []
+        for batch_xs, batch_ys in gen:
+            labels.append(batch_ys)
+            preds.append(self.evaluate_batch(batch_xs, batch_ys))
+        labels = np.hstack(labels)
+        preds = np.hstack(preds)
+        log_loss = sklearn.metrics.log_loss(y_true=labels, y_pred=preds)
+        auc = sklearn.metrics.roc_auc_score(y_true=labels, y_score=preds)
+        return log_loss, auc
+
+    def score(self, state, render=False):
+        self.init_dataset(state)
+        self.build_graph()
+        self.train(state, max_rounds=100, log_step_frequency=10, eval_round_frequency=1, early_stop_rounds=3,
+                   render=render)
+        log_loss, auc = self.evaluate(self.valid_gen, self.valid_writer)
+        return auc
 
 
 if __name__ == "__main__":
-    evalator = Evaluator()
-    state = np.zeros((Config.target_field_combinations, Config.num_fields), dtype=np.int32)
-    for i in range(state.shape[0]):
-        samples = np.random.choice(range(Config.num_fields), size=Config.target_field_len, replace=False)
-        state[i, samples] = 1
-    evalator.init(state)
-    evalator.print_datainfo()
-    for X, y in evalator.batch_generator(gen_type="train"):
-        print(X, y)
-    # numfields = Config.num_fields
-    # list_states = [[i, j, k] for i in range(numfields) for j in range(i + 1, numfields) for k in
-    #                range(j + 1, numfields)]
-    # onehot_states = [np.zeros(numfields, dtype=np.int8) for i in range(len(list_states))]
-    # for i, list_state in enumerate(list_states):
-    #     for j in list_state:
-    #         onehot_states[i][j] = 1
-    # scores = dict()
-    # print(Config.meta)
-    # all_fc = Config.meta["field_combinations"]
-    # evaluator = Evaluator()
-    # for i in range(len(onehot_states)):
-    #     for j in range(i + 1, len(onehot_states)):
-    #         for k in range(j + 1, len(onehot_states)):
-    #             num_hits = 0
-    #             num_hits += 1 if list_states[i] in all_fc else 0
-    #             num_hits += 1 if list_states[j] in all_fc else 0
-    #             num_hits += 1 if list_states[k] in all_fc else 0
-    #             if num_hits not in scores:
-    #                 scores[num_hits] = []
-    #             state = np.stack([onehot_states[i], onehot_states[j], onehot_states[k]])
-    #             scores[num_hits].append(evaluator.score(state))
-    # for num_hits in scores:
-    #     print("num_hits = {} \t cases = {:7d} \t mean_score = {:.3f}".format(
-    #         num_hits, len(scores[num_hits]), np.mean(scores[num_hits])))
+    #    evaluator = Evaluator()
+    #    state = np.zeros((Config.target_combination_num, Config.num_fields), dtype=np.int32)
+    #    for i in range(state.shape[0]):
+    #        samples = np.random.choice(range(Config.num_fields), size=Config.target_combination_len, replace=False)
+    #        state[i, samples] = 1
+    #    evaluator.init_dataset(state)
+    #    evaluator.print_datainfo()
+    #    for X, y in evaluator.batch_generator(gen_type="train"):
+    #        print(X, y)
+    numfields = Config.num_fields
+    list_states = [[i, j, k] for i in range(numfields) for j in range(i + 1, numfields) for k in
+                   range(j + 1, numfields)]
+    onehot_states = [np.zeros(numfields, dtype=np.int8) for i in range(len(list_states))]
+    for i, list_state in enumerate(list_states):
+        for j in list_state:
+            onehot_states[i][j] = 1
+    scores = dict()
+    print(Config.meta)
+    all_fc = Config.meta["field_combinations"]
+    evaluator = Evaluator()
+    for i in range(len(onehot_states)):
+        for j in range(i + 1, len(onehot_states)):
+            for k in range(j + 1, len(onehot_states)):
+                num_hits = 0
+                num_hits += 1 if list_states[i] in all_fc else 0
+                num_hits += 1 if list_states[j] in all_fc else 0
+                num_hits += 1 if list_states[k] in all_fc else 0
+                if num_hits not in scores:
+                    scores[num_hits] = []
+                state = np.stack([onehot_states[i], onehot_states[j], onehot_states[k]])
+                scores[num_hits].append(evaluator.score(state, render=True))
+    for num_hits in scores:
+        print("num_hits = {} \t cases = {:7d} \t mean_score = {:.3f}".format(
+            num_hits, len(scores[num_hits]), np.mean(scores[num_hits])))

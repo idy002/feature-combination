@@ -31,6 +31,8 @@ class Config:
     evaluator_optimizer_name = 'adam'
     evaluator_learning_rate = 0.001
     evaluator_epsilon = 1e-6
+    evaluator_train_logdir = "./summaries/evaluator_train"
+    evaluator_valid_logdir = "./summaries/evaluator_valid"
 
 
     #
@@ -40,5 +42,5 @@ class Config:
     dataset = as_dataset(data_name, False)
     num_fields = dataset.num_fields
     meta = dataset.meta
-    target_field_combinations = len(meta["field_combinations"])
-    target_field_len = meta["lens_fc"][0]
+    target_combination_num = len(meta["field_combinations"])
+    target_combination_len = meta["lens_fc"][0]

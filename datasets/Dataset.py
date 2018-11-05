@@ -194,8 +194,10 @@ class Dataset:
                 one_piece = int(np.ceil(num_lines / num_workers))
                 start = one_piece * task_index
                 stop = one_piece * (task_index + 1)
-                X_block = pd.read_hdf(hdf_in, mode='r', start=start, stop=stop).as_matrix()
-                y_block = pd.read_hdf(hdf_out, mode='r', start=start, stop=stop).as_matrix()
+#                X_block = pd.read_hdf(hdf_in, mode='r', start=start, stop=stop).as_matrix()
+#                y_block = pd.read_hdf(hdf_out, mode='r', start=start, stop=stop).as_matrix()
+                X_block = pd.read_hdf(hdf_in, mode='r', start=start, stop=stop).values
+                y_block = pd.read_hdf(hdf_out, mode='r', start=start, stop=stop).values
                 X_all.append(X_block)
                 y_all.append(y_block)
         X_all = np.vstack(X_all)

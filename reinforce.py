@@ -65,7 +65,7 @@ class Reinforce:
         while len(states) < batch_size:
             rewards = []
             state = np.zeros(Config.num_fields)
-            while np.sum(state) < Config.target_field_len:
+            while np.sum(state) < Config.target_combination_len:
                 action = self.sess.run(self.agent.action, feed_dict={self.agent.X: state.reshape((1, -1))})
                 action = action[0][0]
 

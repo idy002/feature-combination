@@ -34,7 +34,7 @@ class Environment:
         if reward_type == "hit":
             return self.check_hit(state)
         else:
-            if np.sum(state) < Config.target_num_fields:
+            if np.sum(state) < Config.target_combination_len:
                 return 0.0
 
             self.iter_fields = np.concatenate(np.argwhere(state))

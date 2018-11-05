@@ -85,7 +85,7 @@ class Model:
 
     def define_placeholder(self):
         with tf.variable_scope("input"):
-            self.inputs = tf.placeholder(tf.int32, shape=[None, self.input_dim], name="inputs")  # batch * input_dim
+            self.inputs = tf.placeholder(tf.int32, shape=[None, self.num_fields], name="inputs")  # batch * input_dim
             self.labels = tf.placeholder(tf.float32, shape=[None, self.output_dim], name="labels")  # batch * 1
             self.training = tf.placeholder(tf.bool, name="training")
 
@@ -96,7 +96,8 @@ class Model:
     def define_embedding(self, embed_size):
         with tf.variable_scope("embedding"):
             initializer = get_initializer(init_type="xavier")
-            w = tf.get_variable("w", shape=[self.input_dim, embed_size], dtype=tf.float32, initializer=initializer, collections=EMBEDS)
+            w = tf.get_variable("w", shape=[self.input_dim, embed_size], dtype=tf.float32, initializer=initializer,
+                                collections=EMBEDS)
             self.embed = tf.nn.embedding_lookup(w, self.inputs)  # batch * fields * embed_size
 
     '''
@@ -163,9 +164,11 @@ class Model:
                 if l_type == 'full':
                     new_dim = l_param
                     with tf.variable_scope("layer_{}".format(layer_index)):
-                        w = tf.get_variable("w", shape=[cur_dim, new_dim], dtype=tf.float32, initializer=get_activation("xavier"),
+                        w = tf.get_variable("w", shape=[cur_dim, new_dim], dtype=tf.float32,
+                                            initializer=get_activation("xavier"),
                                             collections=NN_WEIGHTS)  # cur_dim * new_dim
-                        b = tf.get_variable("b", shape=[1, new_dim], dtype=tf.float32, initializer=get_initializer(init_type=0.0),
+                        b = tf.get_variable("b", shape=[1, new_dim], dtype=tf.float32,
+                                            initializer=get_initializer(init_type=0.0),
                                             collections=BIASES)  # 1 * new_dim
                         cur_layer = tf.matmul(cur_layer, w) + b
                     layer_index += 1
@@ -188,33 +191,41 @@ class Model:
             for l2_scale, key in l2_items:
                 if l2_scale is not None:
                     variables = tf.get_collection(key)
+                    if len(variables) == 0:
+                        continue
                     sub_l2_loss = tf.multiply(l2_scale, tf.add_n([tf.nn.l2_loss(v) for v in variables]), name=key)
                     l2_losses.append(sub_l2_loss)
-            self.l2_loss = tf.add_n(l2_losses, name="l2_loss")
-            self.log_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.labels, logits=self.logits), name="log_loss")
+            if len(l2_losses) == 0:
+                self.l2_loss = tf.constant(0.0, name="l2_loss")
+            else:
+                self.l2_loss = tf.add_n(l2_losses, name="l2_loss")
+            self.log_loss = tf.reduce_mean(
+                tf.nn.sigmoid_cross_entropy_with_logits(labels=self.labels, logits=self.logits), name="log_loss")
             self.loss = tf.add(self.l2_loss, self.log_loss, name='loss')
 
 
 class LR(Model):
     def __init__(self, input_dim, num_fields, output_dim=1):
-        Model.__init__(input_dim, num_fields, output_dim)
+        Model.__init__(self, input_dim, num_fields, output_dim)
         with tf.variable_scope("lr"):
-
             self.define_placeholder()
 
             self.define_embedding(1)
 
-            bias = tf.get_variable("bias", shape=[1], dtype=tf.float32, collections=BIASES)
+            bias = tf.get_variable("bias", shape=[self.output_dim], dtype=tf.float32, collections=BIASES)
 
-            self.logits = self.embed + bias
+            self.logits = tf.reduce_sum(self.embed, axis=[1]) + bias
+
+            self.preds = tf.sigmoid(self.logits)
 
             self.define_loss(l2_embed=0.01, l2_bias=0.01)
+
+
 
 class PIN(Model):
     def __init__(self, input_dim, num_fields, output_dim=1, embed_size=32):
         Model.__init__(input_dim, num_fields, output_dim)
         with tf.variable_scope("pin"):
-
             self.define_placeholder()
 
             self.define_embedding(embed_size=embed_size)
@@ -233,5 +244,6 @@ class PIN(Model):
 
             self.logits = self.nn_outputs
 
-            self.define_loss()
+            self.preds = tf.sigmoid(self.logits)
 
+            self.define_loss()
