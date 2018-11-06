@@ -17,6 +17,14 @@ def get_optimizer(name, lr):
     else:
         raise ValueError
 
+class StateDatasetIterator:
+    def __init__(self, evaluator, kwargs):
+        self.evaluator = evaluator
+        self.kwargs = kwargs
+
+    def __iter__(self):
+        for batch_xs, batch_ys in Config.dataset.batch_generator(kwargs=self.kwargs):
+            yield evaluator.transformX(batch_xs), batch_ys
 
 class Evaluator:
     def __init__(self):
@@ -110,17 +118,9 @@ class Evaluator:
         data_gen_kwargs["random_sample"] = True
         data_gen_kwargs["val_ratio"] = 0.25
         data_gen_kwargs["gen_type"] = gen_type
+        data_gen_kwargs["squeeze_output"] = False
         data_gen_kwargs["batch_size"] = batch_size
-        if gen_type == 'train':
-            raw_batch_generator = Config.dataset.batch_generator(data_gen_kwargs)
-            for X, y in raw_batch_generator:
-                yield self.transformX(X), np.reshape(y, [-1, 1])
-        elif gen_type == 'valid':
-            raw_batch_generator = Config.dataset.batch_generator(data_gen_kwargs)
-            for X, y in raw_batch_generator:
-                yield self.transformX(X), np.reshape(y, [-1, 1])
-        else:
-            assert False, "Unknown gen_type"
+        return StateDatasetIterator(self, data_gen_kwargs)
 
     def train_batch(self, batch_xs, batch_ys):
         fetches = [self.train_op, self.model.loss, self.model.log_loss, self.model.l2_loss]
@@ -145,7 +145,8 @@ class Evaluator:
             self.start_time = time.time()
             all_auc = []
             while round < max_rounds:
-                print("Round: {}".format(step))
+                if render:
+                    print("Round: {}".format(step))
                 for batch_xs, batch_ys in self.train_gen:
                     loss, log_loss, l2_loss = self.train_batch(batch_xs, batch_ys)
                     step = self.sess.run(self.global_step)
@@ -183,8 +184,8 @@ class Evaluator:
         for batch_xs, batch_ys in gen:
             labels.append(batch_ys)
             preds.append(self.evaluate_batch(batch_xs, batch_ys))
-        labels = np.hstack(labels)
-        preds = np.hstack(preds)
+        labels = np.concatenate(labels)
+        preds = np.concatenate(preds)
         log_loss = sklearn.metrics.log_loss(y_true=labels, y_pred=preds)
         auc = sklearn.metrics.roc_auc_score(y_true=labels, y_score=preds)
         return log_loss, auc
@@ -229,7 +230,9 @@ if __name__ == "__main__":
                 if num_hits not in scores:
                     scores[num_hits] = []
                 state = np.stack([onehot_states[i], onehot_states[j], onehot_states[k]])
-                scores[num_hits].append(evaluator.score(state, render=True))
+                score = evaluator.score(state, render=False)
+                scores[num_hits].append(score)
+                print("State: {}  Num_hit: {} Score: {:3f}".format([i, j, k], num_hits, score))
     for num_hits in scores:
         print("num_hits = {} \t cases = {:7d} \t mean_score = {:.3f}".format(
             num_hits, len(scores[num_hits]), np.mean(scores[num_hits])))
