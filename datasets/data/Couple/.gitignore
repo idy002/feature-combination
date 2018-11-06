@@ -1,3 +1,4 @@
+meta.txt
 feature/*.*
 hdf/*.*
 raw/*.svm

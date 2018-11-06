@@ -62,7 +62,7 @@ class Evaluator:
 
     def build_graph(self):
         self.graph = tf.Graph()
-        self.sess = tf.Session(graph=self.graph)
+        self.sess = tf.Session(config=Config.sess_config, graph=self.graph)
         with self.graph.as_default():
             self.global_step = tf.get_variable('global_step', dtype=tf.int32, initializer=0)
             self.learning_rate = tf.get_variable('learning_rate', dtype=tf.float32,

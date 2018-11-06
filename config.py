@@ -1,4 +1,5 @@
 from datasets import as_dataset
+import tensorflow as tf
 
 
 class Config:
@@ -10,6 +11,8 @@ class Config:
     summaries_dir = "./summaries"  # tensorboard writer target directory
     model_dir = "checkpoints"  # save model in this directory
     save_periods = 100  # save periods
+    sess_config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
+    sess_config.gpu_options.allow_growth = True
 
     #
     #   actor config
