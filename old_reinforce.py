@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from config import Config
 from agent import Agent
-from Environment.environment import Environment
+from environment.old_environment import Environment
 
 
 class Reinforce:

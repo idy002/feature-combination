@@ -1,21 +1,15 @@
 from config import Config
-from Environment.models import as_model
+import sys
+from environment.models import as_model
+from common import get_optimizer
 import time
 import sklearn
+import random
 import numpy as np
 import tensorflow as tf
+import itertools
+import math
 
-
-def get_optimizer(name, lr):
-    name = name.lower()
-    if name == 'sgd' or name == 'gd':
-        return tf.train.GradientDescentOptimizer(lr)
-    elif name == 'adam':
-        return tf.train.AdamOptimizer(lr)
-    elif name == 'adamgrad':
-        return tf.train.AdagradOptimizer(lr)
-    else:
-        raise ValueError
 
 class StateDatasetIterator:
     def __init__(self, evaluator, kwargs):
@@ -26,8 +20,12 @@ class StateDatasetIterator:
         for batch_xs, batch_ys in Config.dataset.batch_generator(kwargs=self.kwargs):
             yield evaluator.transformX(batch_xs), batch_ys
 
+
 class Evaluator:
     def __init__(self):
+        # general
+        self.render = None
+
         # raw dataset information
         self.raw_feat_sizes = Config.dataset.feat_sizes
         self.raw_feat_min = Config.dataset.feat_min
@@ -72,8 +70,11 @@ class Evaluator:
             self.gradients = self.optimizer.compute_gradients(self.model.loss)
             self.train_op = self.optimizer.minimize(self.model.loss, global_step=self.global_step)
             self.saver = tf.train.Saver()
-            self.train_writer = tf.summary.FileWriter(Config.evaluator_train_logdir, graph=self.graph, flush_secs=10.0)
-            self.valid_writer = tf.summary.FileWriter(Config.evaluator_valid_logdir, graph=self.graph, flush_secs=10.0)
+            if self.render:
+                self.train_writer = tf.summary.FileWriter(Config.evaluator_train_logdir, graph=self.graph, flush_secs=10.0)
+                self.valid_writer = tf.summary.FileWriter(Config.evaluator_valid_logdir, graph=self.graph, flush_secs=10.0)
+                graph_writer = tf.summary.FileWriter(Config.evaluator_graph_logdir, graph=self.graph, flush_secs=10.0)
+                graph_writer.close()
 
     def init_dataset(self, state):
         # init the data information
@@ -120,6 +121,7 @@ class Evaluator:
         data_gen_kwargs["gen_type"] = gen_type
         data_gen_kwargs["squeeze_output"] = False
         data_gen_kwargs["batch_size"] = batch_size
+        data_gen_kwargs["on_disk"] = False
         return StateDatasetIterator(self, data_gen_kwargs)
 
     def train_batch(self, batch_xs, batch_ys):
@@ -165,7 +167,6 @@ class Evaluator:
                     all_auc.append(auc)
                     max_auc = max(all_auc)
                     if max(all_auc[-early_stop_rounds:]) < max_auc:
-                        print("earlier stop!")
                         return
                 round += 1
 
@@ -186,53 +187,63 @@ class Evaluator:
             preds.append(self.evaluate_batch(batch_xs, batch_ys))
         labels = np.concatenate(labels)
         preds = np.concatenate(preds)
+        preds = np.clip(preds, 1e-6, 1-1e-6)
         log_loss = sklearn.metrics.log_loss(y_true=labels, y_pred=preds)
         auc = sklearn.metrics.roc_auc_score(y_true=labels, y_score=preds)
         return log_loss, auc
 
     def score(self, state, render=False):
+        self.render = render
         self.init_dataset(state)
         self.build_graph()
-        self.train(state, max_rounds=100, log_step_frequency=10, eval_round_frequency=1, early_stop_rounds=3,
+        self.train(state, max_rounds=300, log_step_frequency=10, eval_round_frequency=1, early_stop_rounds=3,
                    render=render)
         log_loss, auc = self.evaluate(self.valid_gen, self.valid_writer)
         return auc
 
 
 if __name__ == "__main__":
-    #    evaluator = Evaluator()
-    #    state = np.zeros((Config.target_combination_num, Config.num_fields), dtype=np.int32)
-    #    for i in range(state.shape[0]):
-    #        samples = np.random.choice(range(Config.num_fields), size=Config.target_combination_len, replace=False)
-    #        state[i, samples] = 1
-    #    evaluator.init_dataset(state)
-    #    evaluator.print_datainfo()
-    #    for X, y in evaluator.batch_generator(gen_type="train"):
-    #        print(X, y)
-    numfields = Config.num_fields
-    list_states = [[i, j, k] for i in range(numfields) for j in range(i + 1, numfields) for k in
-                   range(j + 1, numfields)]
-    onehot_states = [np.zeros(numfields, dtype=np.int8) for i in range(len(list_states))]
-    for i, list_state in enumerate(list_states):
-        for j in list_state:
-            onehot_states[i][j] = 1
-    scores = dict()
     print(Config.meta)
-    all_fc = Config.meta["field_combinations"]
+    key_fc = Config.meta["field_combinations"]
+    num_key_fc = len(key_fc)
+    len_fc = len(key_fc[0])
+    num_fields = Config.num_fields
+
+    print("key_fc: {}".format(key_fc))
+    print("num_key_fc: {}".format(num_key_fc))
+    print("num_fields: {}".format(num_fields))
+    print("len_fc: {}".format(len_fc))
+    list_fc = [a for a in itertools.combinations(range(num_fields), len_fc)]
+    num_fc = 0
+    for i in list_fc:
+        num_fc += 1
+    print("num_fc: {}".format(num_fc))
+    onehot_fc_notkey = []
+    onehot_fc_key = []
+    for i in range(len(list_fc)):
+        onehot_fc = np.zeros(num_fields)
+        for j in list_fc[i]:
+            onehot_fc[j] = 1
+        if list(list_fc[i]) in key_fc:
+            onehot_fc_key.append(onehot_fc)
+        else:
+            onehot_fc_notkey.append(onehot_fc)
+
     evaluator = Evaluator()
-    for i in range(len(onehot_states)):
-        for j in range(i + 1, len(onehot_states)):
-            for k in range(j + 1, len(onehot_states)):
-                num_hits = 0
-                num_hits += 1 if list_states[i] in all_fc else 0
-                num_hits += 1 if list_states[j] in all_fc else 0
-                num_hits += 1 if list_states[k] in all_fc else 0
-                if num_hits not in scores:
-                    scores[num_hits] = []
-                state = np.stack([onehot_states[i], onehot_states[j], onehot_states[k]])
-                score = evaluator.score(state, render=False)
-                scores[num_hits].append(score)
-                print("State: {}  Num_hit: {} Score: {:3f}".format([i, j, k], num_hits, score))
-    for num_hits in scores:
-        print("num_hits = {} \t cases = {:7d} \t mean_score = {:.3f}".format(
-            num_hits, len(scores[num_hits]), np.mean(scores[num_hits])))
+    scores = [[] for i in range(num_key_fc + 1)]
+    covers = [[] for i in range(num_key_fc + 1)]
+    fmean = lambda x: np.mean(x) if len(x) > 0 else np.NaN
+    fstddev = lambda x: np.std(x, ddof=1) if len(x) > 1 else np.NaN
+    while True:
+        a = random.randint(0, num_key_fc)
+        b = num_key_fc - a
+        cur_fc_list = []
+        cur_fc_list.extend(random.sample(onehot_fc_key, a))
+        cur_fc_list.extend(random.sample(onehot_fc_notkey, b))
+        state = np.stack(cur_fc_list, axis=0)
+        scores[a].append(evaluator.score(state, render=True))
+        covers[a].append(len(np.where(sum(cur_fc_list) > 0)[0]))
+        print('\r', end="")
+        for i in range(num_key_fc + 1):
+            print("{:.4f}({:.2f},{:.2f})  ".format(fmean(scores[i]), fstddev(scores[i]), fmean(covers[i])), end="")
+            sys.stdout.flush()

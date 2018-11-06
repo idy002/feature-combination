@@ -7,8 +7,8 @@ import random
 import sys
 import json
 
-num_fc = int(sys.argv[1]) if int(sys.argv[1]) != -1 else 50
-size_data = int(sys.argv[2]) if int(sys.argv[2]) != -1 else 10000
+size_data = int(sys.argv[1]) if int(sys.argv[1]) != -1 else 10000
+num_fc = 10
 lens_fc = [ 3 ]
 fields = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 max_repeat = 1

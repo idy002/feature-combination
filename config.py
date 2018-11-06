@@ -1,3 +1,8 @@
+import os
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '0, 1'
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = '2'  # only show warning and error
+
 from datasets import as_dataset
 import tensorflow as tf
 
@@ -26,16 +31,18 @@ class Config:
     #
     #   encoder config
     #
+    encoder_dim = 1024
 
     #
     #   evaluator configs
     #
-    evaluator_model_name = "lr"
+    evaluator_model_name = "pin"
     evaluator_optimizer_name = 'adam'
-    evaluator_learning_rate = 0.001
-    evaluator_epsilon = 1e-6
+    evaluator_learning_rate = 0.01
+    evaluator_epsilon = 1e-5
     evaluator_train_logdir = "./summaries/evaluator_train"
     evaluator_valid_logdir = "./summaries/evaluator_valid"
+    evaluator_graph_logdir = "./summaries/evaluator_graph"
 
 
     #
@@ -43,6 +50,7 @@ class Config:
     #
     data_name = "Couple"
     dataset = as_dataset(data_name, False)
+    dataset.summary()
     num_fields = dataset.num_fields
     meta = dataset.meta
     target_combination_num = len(meta["field_combinations"])

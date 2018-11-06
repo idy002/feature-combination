@@ -17,23 +17,25 @@ class Couple(Dataset):
     train_pos_ratio = 0
     test_pos_ratio = 0
     initialized = 0
-    _fields = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-    num_fields = len(_fields)
-    max_length = num_fields
-    num_features = sum(_fields)
-    
-    meta = None
 
-    feat_names = ["f" + str(i) for i in range(num_fields)]
-    feat_sizes = [v for v in _fields]
-    feat_min = [0 for i in range(num_fields)]
-    for i in range(1,num_fields) :
-        feat_min[i] = feat_min[i-1] + feat_sizes[i-1]
     data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/Couple')
     raw_data_dir = os.path.join(data_dir, 'raw')
     feature_data_dir = os.path.join(data_dir, 'feature')
     hdf_data_dir = os.path.join(data_dir, 'hdf')
     meta_file_path = os.path.join(data_dir, 'meta.txt')
+
+    meta = None
+    with open(meta_file_path, "r") as meta_file:
+        meta = json.load(meta_file)
+    _fields = meta["field_sizes"]
+    num_fields = len(_fields)
+    max_length = num_fields
+    num_features = sum(_fields)
+    feat_names = ["f" + str(i) for i in range(num_fields)]
+    feat_sizes = [v for v in _fields]
+    feat_min = [0 for i in range(num_fields)]
+    for i in range(1,num_fields) :
+        feat_min[i] = feat_min[i-1] + feat_sizes[i-1]
 
     def __init__(self, initialized=True):
         self.initialized = initialized
