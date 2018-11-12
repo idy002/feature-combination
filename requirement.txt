@@ -1,0 +1,10 @@
+matplotlib
+tensorflow
+sklearn
+tables
+sklearn
+scikit-learn
+scipy
+numpy
+pandas
+future
