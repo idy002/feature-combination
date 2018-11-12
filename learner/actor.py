@@ -1,39 +1,44 @@
 import tensorflow as tf
+import collections
 import sys
 from config import Config
 from common import get_initializer, get_activation
 import numpy as np
 
+State = collections.namedtuple('State', ['fix_combinations', 'cur_combination'])
 
 class Actor:
-    def __init__(self):
-        sys.stderr.write('Actor.__init__\n')
+    def __init__(self, optimizer, global_step):
+        self.optimizer = optimizer
+
         self.fix_combinations = None  # batch * num_fix * num_fields
         self.cur_combination = None  # batch * 1 * num_fields
+        self.action = None  # batch
+        self.target = None  # batch
         self.fix_encoded = None  # batch * num_fix * encode_dim
         self.cur_encoded = None  # batch * encode_dim
         self.fix_combined = None  # batch * encode_dim
         self.chooser_input = None  # batch * 2 encode_dim
         self.logits = None  # batch * num_fields
-        self.action = None  # batch * 1
+        self.loss = None  # []
+        self.train_op = None  # operation
 
-        sys.stderr.write('start define inputs\n')
         self.define_inputs()
 
-        sys.stderr.write('start define encoder\n')
         self.define_encoder(Config.encoder_dim)
 
-        sys.stderr.write('start define combinator\n')
         self.define_combinator()
 
-        sys.stderr.write('start define chooser\n')
         self.chooser_input = tf.concat([self.fix_combined, self.cur_encoded], axis=1)
         self.define_chooser([('full', 1024), ('act', 'relu'), ('full', 128), ('act', 'relu'), ('full', Config.num_fields)])
+
+        self.define_loss_and_train(global_step)
 
     def define_inputs(self):
         with tf.variable_scope("inputs"):
             self.fix_combinations = tf.cast(tf.placeholder(dtype=tf.int32, shape=[None, None, Config.num_fields]), name="fix_combinations", dtype=tf.float32)
             self.cur_combination = tf.cast(tf.placeholder(dtype=tf.int32, shape=[None, 1, Config.num_fields]), name="cur_combination", dtype=tf.float32)
+            self.action = tf.placeholder(dtype=tf.int32, shape=[None], name="action")
 
     def define_encoder(self, encode_dim):
         with tf.variable_scope("encoder"):
@@ -64,9 +69,31 @@ class Actor:
                 else:
                     raise ValueError
             self.logits = cur_layer  # batch * num_fields
-            assert self.logits.get_shape().as_list()[-1] == Config.num_fields, "Chooser need to get a vector with num_field length here"
-            self.action = tf.multinomial(self.logits, 1, name="chosen", output_dtype=tf.int32)
+            self.action_probs = tf.nn.softmax(self.logits)
 
+    def define_loss_and_train(self, global_step):
+        self.loss = tf.reduce_mean(self.target * tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.action, logits=self.logits, name="loss"))
+        self.train_op = self.optimizer.minimize(self.loss, global_step=global_step)
 
+    '''
+    @:return probability distribution of actions
+    '''
+    def predict(self, state, sess=None):
+        assert isinstance(sess, tf.Session)
+        assert isinstance(state, State)
+        sess = sess or tf.get_default_session()
+        fetches = self.action_probs
+        feed_dict = {self.fix_combinations:state.fix_combinations, self.cur_combination:state.cur_combination}
+        aprobs = sess.run(fetches=fetches, feed_dict=feed_dict)
+        return aprobs
 
+    def update(self, state, target, action, sess=None):
+        assert isinstance(sess, tf.Session)
+        sess = sess or tf.get_default_session()
+        fetches = self.train_op
+        feed_dict = {self.fix_combinations:state.fix_combinations,
+                     self.cur_combination:state.cur_combination,
+                     self.action:action,
+                     self.target:target}
+        sess.run(fetches=fetches, feed_dict=feed_dict)
 

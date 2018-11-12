@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from environment.evaluator import Evaluator
+from learner.actor import State
 
 from config import Config
 
@@ -10,10 +11,13 @@ class Enviroment:
         self.evaluator = Evaluator()
         pass
 
+    def reset(self):
+        return State([], np.zeros(Config.num_fields, dtype=np.int32))
+
     '''
     @:return hasStop, next_state, reward
     '''
-    def do_step(self, state, action):
+    def step(self, state, action):
         fix_combs, cur_comb = state
         if np.sum(cur_comb) == Config.environment_combination_len - 1:
             cur_comb[action] = 1

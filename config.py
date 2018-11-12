@@ -41,7 +41,8 @@ class Config:
 
     #
     #   reinforce config
-    reinforce_graph_logdir = "./summaries/reinforce_graph"
+    reinforce_logdir = "./summaries/reinforce_graph"
+    reinforce_learning_rate = 0.001
 
 
     #
