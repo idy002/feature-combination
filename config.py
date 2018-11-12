@@ -20,6 +20,12 @@ class Config:
     sess_config.gpu_options.allow_growth = True
 
     #
+    #   environment config
+    #
+    environment_combination_len = 5
+    environment_combinations_num = 100
+
+    #
     #   actor config
     #
     lr = 0.001  # learning rate
@@ -32,6 +38,11 @@ class Config:
     #   encoder config
     #
     encoder_dim = 1024
+
+    #
+    #   reinforce config
+    reinforce_graph_logdir = "./summaries/reinforce_graph"
+
 
     #
     #   evaluator configs

@@ -1,4 +1,6 @@
 import tensorflow as tf
+import operator
+import functools
 from common import get_initializer, get_activation
 
 WEIGHTS = [tf.GraphKeys.GLOBAL_VARIABLES, tf.GraphKeys.WEIGHTS]
@@ -40,6 +42,13 @@ class Model:
         self.output_dim = output_dim
         self.num_fields = num_fields
         pass
+
+    def get_num_params(self):
+        num_params = 0
+        for variable in tf.trainable_variables():
+            shape = variable.get_shape()
+            num_params += functools.reduce(operator.mul, [dim.value for dim in shape], 1)
+        return num_params
 
     '''
     define self.inputs, self.labels and self.training
