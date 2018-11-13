@@ -8,7 +8,8 @@ from learner.actor import State
 from config import Config
 
 EpisodeData = namedtuple('EpisodeData', ['fix_combs', 'cur_combs', 'actions', 'rewards', 'discounted_rewards'])
-ClassifiedData = namedtuple('ClassifiedData', ['fix_combs', 'cur_combs', 'actions', 'rewards', 'discounted_rewards'])
+ClassifiedData = namedtuple('ClassifiedData', ['fix_combs', 'cur_combs', 'actions', 'discounted_rewards'])
+
 
 class Reinforce:
     def __init__(self, learning_rate):
@@ -19,50 +20,98 @@ class Reinforce:
         self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         with self.graph.as_default():
             self.global_step = tf.get_variable("global_step", shape=[], dtype=tf.int32, initializer=tf.zeros_initializer, trainable=False)
-            self.actor = Actor(self.optimizer, self.global_step)
+            self.actor = Actor(self.graph, self.sess, self.optimizer)
 
-    def sample_action(self, state, probs):
-        pass
+    @staticmethod
+    def sample_action(state, probs):
+        '''
+        sample an action according to a probability distribution of actions, the occurred field will be ignored
+        :param state: State
+        :param probs: (num_fields) ndarray, the probability distribution of actions
+        :return: the sampled action from the actions that are not in state.cur_combination
+        '''
+        while True:
+            action = np.random.choice(Config.num_fields, p=probs)
+            if state.cur_combination[action] == 0:
+                return action
 
-    def trans_data(self, bdata):
-        return ClassifiedData()
+    @staticmethod
+    def trans_data(episode_data_list):
+        '''
+        transform a list of EpisodeData to a list of ClassifiedData
+        every classified data has different lengths of fix_combinations
+        :param episode_data_list:
+        :return:
+        '''
+        max_length = 0
+        for episodeData in episode_data_list:
+            length = episodeData.fix_combs.shape[0]
+            max_length = max(max_length, length)
+        cdata = [ClassifiedData([], [], [], []) for l in range(max_length + 1)]
+        for episodeData in episode_data_list:
+            episode_len = len(episodeData.actions)
+            for t in range(episode_len):
+                length = episodeData.fix_combs[t].shape[0]
+                cdata[length].fix_combs.append(episodeData.fix_combs[t])
+                cdata[length].cur_combs.append(episodeData.cur_combs[t])
+                cdata[length].actions.append(episodeData.actions[t])
+                cdata[length].discounted_rewards.append(episodeData.discounted_rewards[t])
+        for classifiedData in cdata:
+            classifiedData.fix_combs = np.stack(classifiedData.fix_combs)
+            classifiedData.cur_combs = np.stack(classifiedData.cur_combs)
+            classifiedData.actions = np.stack(classifiedData.actions)
+            classifiedData.discounted_rewards = np.stack(classifiedData.discounted_rewards)
+        return cdata
 
     def train(self, env, num_batches, batch_size, discount_factor=1.0):
-        env = Enviroment()
-        for i_batch in range(num_batches):
-            bdata = []  # batch data
-            for i_episode in range(batch_size):
-                state = env.reset()
-                edata = EpisodeData([], [], [], [], [])  # episode data
-                while True:
-                    probs = self.actor.predict(state, self.sess)
-                    action = self.sample_action(state, probs)
+        global_episode_index = 0
+        with self.graph.as_default():
+            self.sess.run(tf.global_variables_initializer())
+            for i_batch in range(num_batches):
+                #   predict
+                episode_data_list = []
+                for i_episode in range(batch_size):
+                    state = env.reset()
+                    episode_data = EpisodeData([], [], [], [], [])  # episode data
+                    while True:
+                        probs = self.actor.predict(state)
+                        action = self.sample_action(state, probs[0])
 
-                    done, next_state, reward = env.step(state, action)
+                        done, next_state, reward = env.step(state, action)
 
-                    edata.fix_combs.append(state.fix_combinations)
-                    edata.cur_combs.append(state.cur_combination)
-                    edata.actions.append(action)
-                    edata.rewards.append(reward)
-                    if done:
-                        break
-                    state = next_state
-                len_episode = len(edata.rewards)
-                edata.discounted_rewards = list(edata.rewards)
-                for i in range(len_episode-2, -1, -1):
-                    edata.discounted_rewards[i] += edata.discounted_rewards[i+1] * discount_factor
-                bdata.append(edata)
-            cdatas = [self.trans_data(bdata)]
-            # TODO:
-            #   1. finish above two functions,
-            #   2. stack the data in cdatas
-            #   3. train using cdatas
-            #   4. record and output statistics information
+                        episode_data.fix_combs.append(state.fix_combinations)
+                        episode_data.cur_combs.append(state.cur_combination)
+                        episode_data.actions.append(action)
+                        episode_data.rewards.append(reward)
+                        if done:
+                            break
+                        state = next_state
+                    len_episode = len(episode_data.rewards)
+                    episode_data.discounted_rewards = list(episode_data.rewards)
+                    for i in range(len_episode - 2, -1, -1):
+                        episode_data.discounted_rewards[i] += episode_data.discounted_rewards[i + 1] * discount_factor
+                    episode_data_list.append(episode_data)
+                    #  do summary
+                    self.writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='reward', simple_value=reward)]),
+                                            global_step=global_episode_index)
+                    print("Episode {}, Reward {:.3f}".format(global_episode_index, reward))
+                    global_episode_index += 1
+                #   update
+                classified_data_list = self.trans_data(episode_data_list)
+                losses = []
+                for classified_data in classified_data_list:
+                    loss = self.actor.update(classified_data.fix_combs, classified_data.cur_combs,
+                                             classified_data.discounted_rewards, classified_data.actions)
+                    losses.append(loss)
+                mean_loss = np.mean(losses)
+                self.writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='loss', simple_value=mean_loss)]),
+                                        global_step=global_episode_index)
+                print("Batch {}, Loss {:.3f}".format(i_batch, mean_loss))
+        self.writer.flush()
 
 
 if __name__ == "__main__":
     sys.stderr.write('__module__.start\n')
-#    learner = Reinforce()
+    #    learner = Reinforce()
     sys.stderr.write('__module__.end\n')
-
 

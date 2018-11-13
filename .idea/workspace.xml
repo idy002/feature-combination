@@ -2,32 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d89448a5-ecee-4d55-97a6-f895c194b58e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Environment/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Environment/evaluator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Environment/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/Avazu.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/Couple.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/Criteo.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/Criteo_Challenge.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/Criteo_all.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/Dataset.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/criteo_multi_proc.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/data/Couple/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/data/Couple/build.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/data/Couple/couple.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/data/Couple/meta.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/iPinYou.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/multi_proc.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/datasets/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/feature-combination.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/feature-combination.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/Environment/environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reinforce.py" beforeDir="false" afterPath="$PROJECT_DIR$/reinforce.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environment/environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/environment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environment/evaluator.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/evaluator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/learner/actor.py" beforeDir="false" afterPath="$PROJECT_DIR$/learner/actor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/learner/reinforce.py" beforeDir="false" afterPath="$PROJECT_DIR$/learner/reinforce.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,163 +21,188 @@
     <session id="-900334480">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="6" />
-          <entry key="project.open.time.0" value="2" />
-          <entry key="project.open.time.1" value="2" />
-          <entry key="project.open.time.4" value="2" />
+          <entry key="project.closed" value="10" />
+          <entry key="project.open.time.0" value="3" />
+          <entry key="project.open.time.1" value="4" />
+          <entry key="project.open.time.4" value="3" />
           <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="7" />
+          <entry key="project.open.time.9" value="1" />
+          <entry key="project.opened" value="12" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="gitignore" value="1" />
+          <entry key="gitignore" value="2" />
           <entry key="md" value="1" />
-          <entry key="py" value="33" />
-          <entry key="sh" value="1" />
+          <entry key="py" value="68" />
+          <entry key="sh" value="3" />
           <entry key="svm" value="1" />
-          <entry key="txt" value="3" />
+          <entry key="txt" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Bash" value="1" />
+          <entry key="Bash" value="3" />
           <entry key="Markdown" value="1" />
-          <entry key="PLAIN_TEXT" value="5" />
-          <entry key="Python" value="33" />
+          <entry key="PLAIN_TEXT" value="8" />
+          <entry key="Python" value="68" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="dummy" value="30" />
-          <entry key="py" value="50218" />
+          <entry key="dummy" value="38" />
+          <entry key="py" value="86077" />
+          <entry key="sh" value="29" />
+          <entry key="txt" value="446" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="30" />
-          <entry key="Python" value="50218" />
+          <entry key="Bash" value="29" />
+          <entry key="PLAIN_TEXT" value="484" />
+          <entry key="Python" value="86077" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
     </session>
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Environment/environment.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="10" column="29" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
-              <folding>
-                <element signature="e#0#31#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Environment/models.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="151">
-              <caret line="198" column="39" lean-forward="true" selection-start-line="198" selection-start-column="39" selection-end-line="198" selection-end-column="39" />
-              <folding>
-                <marker date="1541416898001" expanded="true" signature="910:912" ph="..." />
-                <marker date="1541416898001" expanded="true" signature="912:1943" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Environment/evaluator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="108" column="42" selection-start-line="108" selection-start-column="42" selection-end-line="108" selection-end-column="42" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-                <marker date="1541426652158" expanded="true" signature="139:433" ph="..." />
-                <marker date="1541426652158" expanded="true" signature="2061:2065" ph="..." />
-                <marker date="1541426652158" expanded="true" signature="2678:2926" ph="..." />
-                <marker date="1541426652158" expanded="true" signature="4528:4533" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/datasets/test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="15" selection-start-line="4" selection-start-column="15" selection-end-line="4" selection-end-column="15" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/reinforce.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1088">
-              <caret line="68" column="56" selection-start-line="68" selection-start-column="56" selection-end-line="68" selection-end-column="56" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="33" selection-start-line="33" selection-end-line="33" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/agent.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/datasets/data/Couple/meta.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="21" column="7" selection-start-line="21" selection-start-column="7" selection-end-line="21" selection-end-column="7" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="6" column="20" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="20" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/datasets/Couple.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="697">
-              <caret line="44" column="38" selection-start-line="44" selection-start-column="38" selection-end-line="44" selection-end-column="38" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="horizontal" split-proportion="0.8055917">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/environment/models.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-1385">
+                  <caret line="94" selection-start-line="94" selection-end-line="94" />
+                  <folding>
+                    <element signature="e#0#23#0" expanded="true" />
+                    <marker date="1541852814936" expanded="true" signature="539:540" ph="..." />
+                    <marker date="1541852814936" expanded="true" signature="1302:1538" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/learner/actor.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="147">
+                  <caret line="90" column="85" selection-start-line="90" selection-start-column="85" selection-end-line="90" selection-end-column="85" />
+                  <folding>
+                    <element signature="e#0#23#0" expanded="true" />
+                    <marker date="1542112128128" expanded="true" signature="1427:1957" ph="..." />
+                    <marker date="1542112128128" expanded="true" signature="3784:3788" ph="..." />
+                    <marker date="1542112128128" expanded="true" signature="3820:4035" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="171">
+                  <caret line="1578" selection-start-line="1578" selection-end-line="1578" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/client/session.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="155">
+                  <caret line="1075" selection-start-line="1075" selection-end-line="1075" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/framework/constant_op.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="165">
+                  <caret line="195" selection-start-line="195" selection-end-line="195" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/learner/reinforce.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="300">
+                  <caret line="77" column="66" selection-start-line="77" selection-start-column="66" selection-end-line="77" selection-end-column="66" />
+                  <folding>
+                    <element signature="e#0#23#0" expanded="true" />
+                    <marker date="1542112209042" expanded="true" signature="1631:2973" ph="..." />
+                    <marker date="1542112209042" expanded="true" signature="2969:2973" ph="..." />
+                    <marker date="1542112209042" expanded="true" signature="3040:3041" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/environment/environment.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="189">
+                  <caret line="30" column="68" selection-start-line="30" selection-start-column="68" selection-end-line="30" selection-end-column="68" />
+                  <folding>
+                    <element signature="e#0#23#0" expanded="true" />
+                    <marker date="1542112424635" expanded="true" signature="407:455" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="156">
+                  <caret line="59" selection-start-line="59" selection-end-line="59" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/ops/array_ops.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="156">
+                  <caret line="2658" selection-start-line="2658" selection-end-line="2658" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/environment/evaluator.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-1688">
+                  <caret line="84" selection-start-line="84" selection-end-line="84" />
+                  <folding>
+                    <element signature="e#0#25#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/environment/evaluator.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="174">
+                  <caret line="159" column="77" selection-start-line="159" selection-start-column="77" selection-end-line="159" selection-end-column="77" />
+                  <folding>
+                    <element signature="e#0#25#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -221,21 +228,34 @@
         <option value="$PROJECT_DIR$/dataset.py" />
         <option value="$PROJECT_DIR$/reward.py" />
         <option value="$PROJECT_DIR$/agent.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/../Ads-RecSys-Datasets/datasets/Dataset.py" />
-        <option value="$PROJECT_DIR$/environment/evaluator.py" />
         <option value="$PROJECT_DIR$/Ads-RecSys-Datasets/test.py" />
         <option value="$PROJECT_DIR$/datasets/test.py" />
         <option value="$PROJECT_DIR$/datasets/__init__.py" />
-        <option value="$PROJECT_DIR$/datasets/data/Couple/couple.py" />
-        <option value="$PROJECT_DIR$/datasets/Couple.py" />
         <option value="$PROJECT_DIR$/environment.py" />
         <option value="$PROJECT_DIR$/datasets/Dataset.py" />
         <option value="$PROJECT_DIR$/evaluator.py" />
         <option value="$PROJECT_DIR$/reinforce.py" />
+        <option value="$PROJECT_DIR$/datasets/Couple.py" />
+        <option value="$PROJECT_DIR$/datasets/data/Couple/build.sh" />
         <option value="$PROJECT_DIR$/Environment/models.py" />
-        <option value="$PROJECT_DIR$/config.py" />
         <option value="$PROJECT_DIR$/Environment/evaluator.py" />
+        <option value="$PROJECT_DIR$/datasets/data/Couple/couple.py" />
+        <option value="$PROJECT_DIR$/actor/encoder.py" />
+        <option value="$PROJECT_DIR$/actor/chooser.py" />
+        <option value="$PROJECT_DIR$/common.py" />
+        <option value="$PROJECT_DIR$/actor/combinator.py" />
+        <option value="$PROJECT_DIR$/learner.py" />
+        <option value="$PROJECT_DIR$/old_reinforce.py" />
+        <option value="$PROJECT_DIR$/actor/actor.py" />
+        <option value="$PROJECT_DIR$/environment/models.py" />
+        <option value="$PROJECT_DIR$/requirement.txt" />
+        <option value="$PROJECT_DIR$/config.py" />
+        <option value="$PROJECT_DIR$/environment/evaluator.py" />
+        <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/learner/actor.py" />
+        <option value="$PROJECT_DIR$/learner/reinforce.py" />
+        <option value="$PROJECT_DIR$/environment/environment.py" />
       </list>
     </option>
   </component>
@@ -270,6 +290,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -280,26 +301,26 @@
             <path>
               <item name="feature-combination" type="b2602c69:ProjectViewProjectNode" />
               <item name="feature-combination" type="462c0819:PsiDirectoryNode" />
-              <item name="datasets" type="462c0819:PsiDirectoryNode" />
+              <item name="environment" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="feature-combination" type="b2602c69:ProjectViewProjectNode" />
               <item name="feature-combination" type="462c0819:PsiDirectoryNode" />
-              <item name="Environment" type="462c0819:PsiDirectoryNode" />
+              <item name="learner" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../Ads-RecSys-Datasets" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/learner" />
       <recent name="$PROJECT_DIR$/Environment" />
       <recent name="$PROJECT_DIR$/datasets/data" />
       <recent name="$PROJECT_DIR$" />
@@ -318,7 +339,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.evaluator">
+  <component name="RunManager" selected="Python.main">
     <configuration name="evaluator" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="feature-combination" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -327,11 +348,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Environment/evaluator.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/environment/evaluator.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -373,28 +394,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/reinforce.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="feature-combination" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/datasets" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/datasets/test.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/learner/reinforce.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -404,17 +404,15 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.evaluator" />
       <item itemvalue="Python.reinforce" />
       <item itemvalue="Python.main" />
-      <item itemvalue="Python.test" />
-      <item itemvalue="Python.evaluator" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.evaluator" />
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.reinforce" />
+        <item itemvalue="Python.evaluator" />
       </list>
     </recent_temporary>
   </component>
@@ -429,24 +427,75 @@
       <option name="presentableId" value="Default" />
       <updated>1538801808905</updated>
     </task>
+    <task id="LOCAL-00001" summary="add evaluator and models, not finish">
+      <created>1541426669791</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1541426669791</updated>
+    </task>
+    <task id="LOCAL-00002" summary="can run now">
+      <created>1541474394564</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1541474394564</updated>
+    </task>
+    <task id="LOCAL-00003" summary="finish test of evaluator and add actor.py">
+      <created>1541512937959</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1541512937959</updated>
+    </task>
+    <task id="LOCAL-00004" summary="add environment.py">
+      <created>1541992739355</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1541992739355</updated>
+    </task>
+    <task id="LOCAL-00005" summary="add requirement.txt">
+      <created>1541994267537</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1541994267537</updated>
+    </task>
+    <task id="LOCAL-00006" summary="working on: reinforce.py, actor.py">
+      <created>1542030973738</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1542030973738</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2429441" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14886552" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.41222224" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.58444446" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.4443243" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.5654054" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32972974" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.14162162" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32972974" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32864866" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.1427027" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -489,16 +538,29 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/Ads-RecSys-Datasets" />
     </ignored-roots>
+    <MESSAGE value="add evaluator and models, not finish" />
+    <MESSAGE value="can run now" />
+    <MESSAGE value="finish test of evaluator and add actor.py" />
+    <MESSAGE value="add environment.py" />
+    <MESSAGE value="add requirement.txt" />
+    <MESSAGE value="working on: reinforce.py, actor.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="working on: reinforce.py, actor.py" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="self" language="Python" />
+        <watch expression="labels.shape" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
+      <expression>
+        <expression-string>labels.shape</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>self</expression-string>
         <language-id>Python</language-id>
@@ -513,13 +575,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="430">
           <caret line="194" selection-start-line="194" selection-end-line="194" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/client/session.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
-          <caret line="1277" selection-start-line="1277" selection-end-line="1277" />
         </state>
       </provider>
     </entry>
@@ -541,66 +596,24 @@
     <entry file="file://$PROJECT_DIR$/Ads-RecSys-Datasets/README.md" />
     <entry file="file://$PROJECT_DIR$/Ads-RecSys-Datasets/.gitignore" />
     <entry file="file://$PROJECT_DIR$/datasets/Avazu.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/Ads-RecSys-Datasets/test.py" />
     <entry file="file://$PROJECT_DIR$/datasets/data/__init__.py" />
     <entry file="file://$PROJECT_DIR$/datasets/data/Couple/__init__.py" />
     <entry file="file://$PROJECT_DIR$/datasets/Criteo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/datasets/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
           <caret line="8" column="11" lean-forward="true" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/data/Couple/build.sh">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/datasets/data/Couple/raw/raw.svm">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2295" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/Dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4216">
-          <caret line="253" column="87" selection-start-line="253" selection-start-column="87" selection-end-line="253" selection-end-column="87" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/data/Couple/couple.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1632">
-          <caret line="98" column="32" selection-start-line="98" selection-start-column="32" selection-end-line="98" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Environment/environment.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="10" column="29" selection-start-line="10" selection-start-column="29" selection-end-line="10" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/datasets/test.py">
@@ -610,78 +623,225 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/reinforce.py">
+    <entry file="file://$PROJECT_DIR$/datasets/data/Couple/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1088">
-          <caret line="68" column="56" selection-start-line="68" selection-start-column="56" selection-end-line="68" selection-end-column="56" />
+        <state relative-caret-position="51">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/data/Couple/meta.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="30" column="7" selection-start-line="30" selection-start-column="7" selection-end-line="30" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/Dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3638">
+          <caret line="219" column="62" selection-start-line="219" selection-start-column="62" selection-end-line="219" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/Couple.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="33" column="4" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/sklearn/metrics/classification.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="443">
+          <caret line="1693" selection-start-line="1693" selection-end-line="1693" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/ops/gradients_impl.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="137">
+          <caret line="107" selection-start-line="107" selection-end-line="107" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/data/Couple/build.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/data/Couple/couple.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="11" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/actor/encoder.py" />
+    <entry file="file://$PROJECT_DIR$/actor/chooser.py" />
+    <entry file="file://$PROJECT_DIR$/actor/combinator.py" />
+    <entry file="file://$PROJECT_DIR$/actor/__init__.py" />
+    <entry file="file://$PROJECT_DIR$/learner.py" />
+    <entry file="file://$PROJECT_DIR$/learner/__init__.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirement.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/agent.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="29" column="14" selection-start-line="29" selection-start-column="14" selection-end-line="29" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/old_reinforce.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="43">
+          <caret line="23" column="94" selection-start-line="23" selection-start-column="94" selection-end-line="23" selection-end-column="94" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/agent.py">
+    <entry file="file://$PROJECT_DIR$/environment/old_environment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/data/Couple/meta.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="21" column="7" selection-start-line="21" selection-start-column="7" selection-end-line="21" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="6" column="20" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="20" />
+        <state relative-caret-position="1411">
+          <caret line="83" selection-start-line="83" selection-end-line="83" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/Couple.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="697">
-          <caret line="44" column="38" selection-start-line="44" selection-start-column="38" selection-end-line="44" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="33" selection-start-line="33" selection-end-line="33" />
+        <state relative-caret-position="731">
+          <caret line="43" column="13" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Environment/models.py">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="198" column="39" lean-forward="true" selection-start-line="198" selection-start-column="39" selection-end-line="198" selection-end-column="39" />
+        <state relative-caret-position="204">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
           <folding>
-            <marker date="1541416898001" expanded="true" signature="910:912" ph="..." />
-            <marker date="1541416898001" expanded="true" signature="912:1943" ph="..." />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Environment/evaluator.py">
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/framework/tensor_util.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="108" column="42" selection-start-line="108" selection-start-column="42" selection-end-line="108" selection-end-column="42" />
+        <state relative-caret-position="165">
+          <caret line="423" selection-start-line="423" selection-end-line="423" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/framework/constant_op.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="195" selection-start-line="195" selection-end-line="195" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/framework/ops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="1578" selection-start-line="1578" selection-end-line="1578" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/client/session.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="1075" selection-start-line="1075" selection-end-line="1075" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/learner/actor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="147">
+          <caret line="90" column="85" selection-start-line="90" selection-start-column="85" selection-end-line="90" selection-end-column="85" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <marker date="1542112128128" expanded="true" signature="1427:1957" ph="..." />
+            <marker date="1542112128128" expanded="true" signature="3784:3788" ph="..." />
+            <marker date="1542112128128" expanded="true" signature="3820:4035" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/learner/reinforce.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="77" column="66" selection-start-line="77" selection-start-column="66" selection-end-line="77" selection-end-column="66" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <marker date="1542112209042" expanded="true" signature="1631:2973" ph="..." />
+            <marker date="1542112209042" expanded="true" signature="2969:2973" ph="..." />
+            <marker date="1542112209042" expanded="true" signature="3040:3041" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/evaluator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1688">
+          <caret line="84" selection-start-line="84" selection-end-line="84" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
-            <marker date="1541426652158" expanded="true" signature="139:433" ph="..." />
-            <marker date="1541426652158" expanded="true" signature="2061:2065" ph="..." />
-            <marker date="1541426652158" expanded="true" signature="2678:2926" ph="..." />
-            <marker date="1541426652158" expanded="true" signature="4528:4533" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/environment.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="30" column="68" selection-start-line="30" selection-start-column="68" selection-end-line="30" selection-end-column="68" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <marker date="1542112424635" expanded="true" signature="407:455" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="59" selection-start-line="59" selection-end-line="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/tensorflow/python/ops/array_ops.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="2658" selection-start-line="2658" selection-end-line="2658" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1385">
+          <caret line="94" selection-start-line="94" selection-end-line="94" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <marker date="1541852814936" expanded="true" signature="539:540" ph="..." />
+            <marker date="1541852814936" expanded="true" signature="1302:1538" ph="..." />
           </folding>
         </state>
       </provider>

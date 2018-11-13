@@ -133,12 +133,11 @@ class Evaluator:
     def get_elapsed(self):
         return time.time() - self.start_time
 
-    '''
-    train the model given the specified state, use auc as the performance. 
-    '''
-
     def train(self, state, max_rounds=100, log_step_frequency=10, eval_round_frequency=1, early_stop_rounds=3,
               render=True):
+        """
+        train the model given the specified state, use auc as the performance.
+        """
         with self.graph.as_default():
             self.train_gen = self.batch_generator(gen_type="train", batch_size=1000)
             step = 0
@@ -187,7 +186,7 @@ class Evaluator:
             preds.append(self.evaluate_batch(batch_xs, batch_ys))
         labels = np.concatenate(labels)
         preds = np.concatenate(preds)
-        preds = np.clip(preds, 1e-6, 1-1e-6)
+        preds = np.clip(preds, 1e-6, 1 - 1e-6)
         log_loss = sklearn.metrics.log_loss(y_true=labels, y_pred=preds)
         auc = sklearn.metrics.roc_auc_score(y_true=labels, y_score=preds)
         return log_loss, auc
