@@ -30,6 +30,7 @@ class Reinforce:
         :param probs: (num_fields) ndarray, the probability distribution of actions
         :return: the sampled action from the actions that are not in state.cur_combination
         '''
+        probs = np.where(state.cur_combination == 0, probs, 0)
         while True:
             action = np.random.choice(Config.num_fields, p=probs)
             if state.cur_combination[action] == 0:
@@ -45,8 +46,10 @@ class Reinforce:
         '''
         max_length = 0
         for episodeData in episode_data_list:
-            length = episodeData.fix_combs.shape[0]
-            max_length = max(max_length, length)
+            episode_len = len(episodeData.actions)
+            for t in range(episode_len):
+                length = episodeData.fix_combs[t].shape[0]
+                max_length = max(max_length, length)
         cdata = [ClassifiedData([], [], [], []) for l in range(max_length + 1)]
         for episodeData in episode_data_list:
             episode_len = len(episodeData.actions)
@@ -56,12 +59,17 @@ class Reinforce:
                 cdata[length].cur_combs.append(episodeData.cur_combs[t])
                 cdata[length].actions.append(episodeData.actions[t])
                 cdata[length].discounted_rewards.append(episodeData.discounted_rewards[t])
+        result = []
         for classifiedData in cdata:
-            classifiedData.fix_combs = np.stack(classifiedData.fix_combs)
-            classifiedData.cur_combs = np.stack(classifiedData.cur_combs)
-            classifiedData.actions = np.stack(classifiedData.actions)
-            classifiedData.discounted_rewards = np.stack(classifiedData.discounted_rewards)
-        return cdata
+            if len(classifiedData.fix_combs) == 0:
+                continue
+            result.append(ClassifiedData(
+                fix_combs=np.stack(classifiedData.fix_combs),
+                cur_combs=np.stack(classifiedData.cur_combs),
+                actions=np.stack(classifiedData.actions),
+                discounted_rewards=np.stack(classifiedData.discounted_rewards)
+            ))
+        return result
 
     def train(self, env, num_batches, batch_size, discount_factor=1.0):
         global_episode_index = 0
@@ -74,7 +82,7 @@ class Reinforce:
                     state = env.reset()
                     episode_data = EpisodeData([], [], [], [], [])  # episode data
                     while True:
-                        probs = self.actor.predict(state)
+                        probs, logits = self.actor.predict(state)
                         action = self.sample_action(state, probs[0])
 
                         done, next_state, reward = env.step(state, action)
@@ -83,11 +91,11 @@ class Reinforce:
                         episode_data.cur_combs.append(state.cur_combination)
                         episode_data.actions.append(action)
                         episode_data.rewards.append(reward)
+                        state = next_state
                         if done:
                             break
-                        state = next_state
                     len_episode = len(episode_data.rewards)
-                    episode_data.discounted_rewards = list(episode_data.rewards)
+                    episode_data.discounted_rewards.extend(episode_data.rewards)
                     for i in range(len_episode - 2, -1, -1):
                         episode_data.discounted_rewards[i] += episode_data.discounted_rewards[i + 1] * discount_factor
                     episode_data_list.append(episode_data)
@@ -95,6 +103,7 @@ class Reinforce:
                     self.writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='reward', simple_value=reward)]),
                                             global_step=global_episode_index)
                     print("Episode {}, Reward {:.3f}".format(global_episode_index, reward))
+                    print("Selected Field Combinations:\n{}".format(state.fix_combinations))
                     global_episode_index += 1
                 #   update
                 classified_data_list = self.trans_data(episode_data_list)

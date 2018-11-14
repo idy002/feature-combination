@@ -18,7 +18,7 @@ class StateDatasetIterator:
 
     def __iter__(self):
         for batch_xs, batch_ys in Config.dataset.batch_generator(kwargs=self.kwargs):
-            yield evaluator.transformX(batch_xs), batch_ys
+            yield self.evaluator.transformX(batch_xs), batch_ys
 
 
 class Evaluator:

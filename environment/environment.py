@@ -12,9 +12,9 @@ class Enviroment:
         pass
 
     def reset(self):
-        empty_combination = np.zeros(Config.num_fields)
-        fix_combs = empty_combination[np.newaxis, :]
-        cur_comb = empty_combination
+        num_fields = Config.num_fields
+        fix_combs = np.zeros(num_fields)[np.newaxis, :]
+        cur_comb = np.zeros(num_fields)
         return State(fix_combs, cur_comb)
 
     '''
@@ -22,8 +22,8 @@ class Enviroment:
     '''
     def step(self, state, action):
         fix_combs, cur_comb = state
-        if np.sum(cur_comb) == Config.environment_combination_len - 1:
-            cur_comb[action] = 1
+        cur_comb[action] = 1
+        if np.sum(cur_comb) == Config.environment_combination_len:
             fix_combs = np.concatenate([fix_combs, cur_comb[np.newaxis, :]])
             cur_comb = np.zeros_like(cur_comb)
         next_state = State(fix_combs, cur_comb)

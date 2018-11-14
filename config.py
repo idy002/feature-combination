@@ -22,8 +22,8 @@ class Config:
     #
     #   environment config
     #
-    environment_combination_len = 5
-    environment_combinations_num = 100
+    environment_combination_len = 3
+    environment_combinations_num = 2
 
     #
     #   actor config
