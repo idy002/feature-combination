@@ -47,7 +47,7 @@ class Actor:
 
     def define_encoder(self, encode_dim):
         with tf.variable_scope("encoder"):
-            w = tf.get_variable("w", shape=[Config.num_fields, encode_dim], dtype=tf.float32, initializer=get_initializer("xavier"))
+            self.encoder_w = w = tf.get_variable("w", shape=[Config.num_fields, encode_dim], dtype=tf.float32, initializer=get_initializer("xavier"))
             self.fix_encoded = tf.sigmoid(tf.tensordot(self.fix_combinations, w, 1), name="fix_encoded")  # batch * fix_num * encode_dim
             self.cur_encoded = tf.sigmoid(tf.tensordot(self.cur_combination, w, 1), name="cur_encoded")  # batch * encode_dim
 
@@ -74,30 +74,34 @@ class Actor:
                 else:
                     raise ValueError
             self.logits = cur_layer
-            powers = tf.exp(self.logits)
-            unselected_value = tf.where(tf.equal(self.cur_combination, 0), powers, tf.zeros(shape=tf.shape(self.cur_combination)))
-            dominator = tf.tile(tf.reshape(tf.reduce_sum(unselected_value, axis=1), shape=[-1,1]), [1, Config.num_fields])
-            self.action_probs = tf.div(powers, dominator)
+            self.action_probs = tf.nn.softmax(self.logits)
 
     def define_loss_and_train(self):
-        batch_size = tf.shape(self.cur_combination)[0]
-        seq = tf.expand_dims(tf.range(start=0, limit=batch_size, dtype=tf.int32), axis=1)
-        positions = tf.concat([seq, tf.expand_dims(self.action, axis=1)], axis=1)  # batch * 2
-        probs = tf.gather_nd(self.action_probs, positions)  # batch
-        self.loss = tf.reduce_mean(self.target * (-tf.log(probs)))
-#       self.loss = tf.reduce_mean(self.target * tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.action, logits=self.logits, name="loss"))
+        self.loss = self.target * tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.action, logits=self.logits)
         self.train_op = self.optimizer.minimize(self.loss)
+#        batch_size = tf.shape(self.cur_combination)[0]
+#        seq = tf.expand_dims(tf.range(start=0, limit=batch_size, dtype=tf.int32), axis=1)
+#        positions = tf.concat([seq, tf.expand_dims(self.action, axis=1)], axis=1)  # batch * 2
+#        probs = tf.gather_nd(self.action_probs, positions)  # batch
+#        self.loss = tf.reduce_mean(self.target * (-tf.log(probs)))
+#       self.loss = tf.reduce_mean(self.target * tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.action, logits=self.logits, name="loss"))
+#        self.train_op = self.optimizer.minimize(self.loss)
+
+    def watch(self, fetches, feed_dict):
+        return self.sess.run(fetches=fetches, feed_dict=feed_dict)
 
     def predict(self, state):
         """
         @:return probability distribution of actions
         """
         assert isinstance(state, State)
-        fetches = [self.action_probs, self.logits]
         fix_combs = state.fix_combinations[np.newaxis, :, :]
         cur_combs = state.cur_combination[np.newaxis, :]
+        fetches = [self.action_probs, self.logits]
         feed_dict = {self.fix_combinations: fix_combs, self.cur_combination: cur_combs}
         aprobs, logits = self.sess.run(fetches=fetches, feed_dict=feed_dict)
+        debug_fetches = [self.fix_combinations, self.cur_combination, self.encoder_w, self.fix_combined, self.cur_encoded, self.logits, self.action_probs]
+        print("fix_combinations:\n{}\ncur_combination:\n{}\nencoder/w:\n{}\nfix_combined:\n{}\ncur_encoded:\n{}\nlogits:\n{}\naction_probs:\n{}".format(*self.watch(debug_fetches, feed_dict=feed_dict)))
         return aprobs, logits
 
     def update(self, fix_combs, cur_combs, target, action):

@@ -30,11 +30,14 @@ class Reinforce:
         :param probs: (num_fields) ndarray, the probability distribution of actions
         :return: the sampled action from the actions that are not in state.cur_combination
         '''
-        probs = np.where(state.cur_combination == 0, probs, 0)
+        num_fail = 0
         while True:
             action = np.random.choice(Config.num_fields, p=probs)
             if state.cur_combination[action] == 0:
                 return action
+            else:
+                num_fail += 1
+
 
     @staticmethod
     def trans_data(episode_data_list):

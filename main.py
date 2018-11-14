@@ -8,6 +8,7 @@ from learner.reinforce import Reinforce
 from environment.environment import Enviroment
 
 
+
 env = Enviroment()
 reinforce = Reinforce(learning_rate=0.01)
 reinforce.train(env, num_batches=50, batch_size=3, discount_factor=1.0)
