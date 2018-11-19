@@ -23,7 +23,7 @@ class Config:
     #   environment config
     #
     environment_combination_len = 3
-    environment_combinations_num = 2
+    environment_combinations_num = 10
 
     #
     #   actor config
@@ -48,7 +48,7 @@ class Config:
     #
     #   evaluator configs
     #
-    evaluator_model_name = "pin"
+    evaluator_model_name = "lr"  #  'pin', 'lr'
     evaluator_optimizer_name = 'adam'
     evaluator_learning_rate = 0.01
     evaluator_epsilon = 1e-5

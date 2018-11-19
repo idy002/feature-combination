@@ -30,22 +30,18 @@ class Reinforce:
         :param probs: (num_fields) ndarray, the probability distribution of actions
         :return: the sampled action from the actions that are not in state.cur_combination
         '''
-        num_fail = 0
-        while True:
-            action = np.random.choice(Config.num_fields, p=probs)
-            if state.cur_combination[action] == 0:
-                return action
-            else:
-                num_fail += 1
+        num_actions = Config.num_fields - np.sum(state.cur_combination)
+        return np.random.choice(num_actions, p=probs)
 
 
     @staticmethod
     def trans_data(episode_data_list):
         '''
         transform a list of EpisodeData to a list of ClassifiedData
-        every classified data has different lengths of fix_combinations
+        every (fix_combinations, cur_combination) has the same shape in the same in the same classified data, which
+        means the function classified a transition by the shape of fix_combinations and cur_combination
         :param episode_data_list:
-        :return:
+        :return: classified data list
         '''
         max_length = 0
         for episodeData in episode_data_list:
@@ -53,25 +49,30 @@ class Reinforce:
             for t in range(episode_len):
                 length = episodeData.fix_combs[t].shape[0]
                 max_length = max(max_length, length)
-        cdata = [ClassifiedData([], [], [], []) for l in range(max_length + 1)]
+        cdata = [[ClassifiedData([], [], [], []) for num_fields_cur in range(Config.num_fields+1)]
+                    for num_combs_fix in range(max_length + 1)]
         for episodeData in episode_data_list:
             episode_len = len(episodeData.actions)
             for t in range(episode_len):
-                length = episodeData.fix_combs[t].shape[0]
-                cdata[length].fix_combs.append(episodeData.fix_combs[t])
-                cdata[length].cur_combs.append(episodeData.cur_combs[t])
-                cdata[length].actions.append(episodeData.actions[t])
-                cdata[length].discounted_rewards.append(episodeData.discounted_rewards[t])
+                num_combs_fix = episodeData.fix_combs[t].shape[0]
+                num_fields_cur = int(np.sum(episodeData.cur_combs[t]))
+
+                assert episodeData.actions[t] < Config.num_fields - np.sum(episodeData.cur_combs[t]), 'NO'
+                cdata[num_combs_fix][num_fields_cur].fix_combs.append(episodeData.fix_combs[t])
+                cdata[num_combs_fix][num_fields_cur].cur_combs.append(episodeData.cur_combs[t])
+                cdata[num_combs_fix][num_fields_cur].actions.append(episodeData.actions[t])
+                cdata[num_combs_fix][num_fields_cur].discounted_rewards.append(episodeData.discounted_rewards[t])
         result = []
-        for classifiedData in cdata:
-            if len(classifiedData.fix_combs) == 0:
-                continue
-            result.append(ClassifiedData(
-                fix_combs=np.stack(classifiedData.fix_combs),
-                cur_combs=np.stack(classifiedData.cur_combs),
-                actions=np.stack(classifiedData.actions),
-                discounted_rewards=np.stack(classifiedData.discounted_rewards)
-            ))
+        for classifiedDataList in cdata:
+            for classifiedData in classifiedDataList:
+                if len(classifiedData.fix_combs) == 0:
+                    continue
+                result.append(ClassifiedData(
+                    fix_combs=np.stack(classifiedData.fix_combs),
+                    cur_combs=np.stack(classifiedData.cur_combs),
+                    actions=np.stack(classifiedData.actions),
+                    discounted_rewards=np.stack(classifiedData.discounted_rewards)
+                ))
         return result
 
     def train(self, env, num_batches, batch_size, discount_factor=1.0):
@@ -94,6 +95,7 @@ class Reinforce:
                         episode_data.cur_combs.append(state.cur_combination)
                         episode_data.actions.append(action)
                         episode_data.rewards.append(reward)
+
                         state = next_state
                         if done:
                             break

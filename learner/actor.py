@@ -8,11 +8,29 @@ State = collections.namedtuple('State', ['fix_combinations', 'cur_combination'])
 
 
 class Actor:
+    '''
+        num_fix_combinations
+        num_cur_fields
+        fix_combinations
+        cur_combination
+        action: the corresponding action for every state, the i means select the ith available action
+        target
+        fix_encoded
+        cur_encoded
+        fix_combined
+        chooser_input
+        logits
+        action_probs
+        loss
+        train_op
+    '''
     def __init__(self, graph, sess, optimizer):
         self.graph = graph
         self.sess = sess
         self.optimizer = optimizer
 
+        self.num_fix_combinations = None  # []
+        self.num_cur_fields = None  # []
         self.fix_combinations = None  # batch * num_fix * num_fields
         self.cur_combination = None  # batch * num_fields
         self.action = None  # batch
@@ -40,14 +58,19 @@ class Actor:
 
     def define_inputs(self):
         with tf.variable_scope("inputs"):
-            self.fix_combinations = tf.cast(tf.placeholder(dtype=tf.int32, shape=[None, None, Config.num_fields]), name="fix_combinations", dtype=tf.float32)
-            self.cur_combination = tf.cast(tf.placeholder(dtype=tf.int32, shape=[None, Config.num_fields]), name="cur_combination", dtype=tf.float32)
+            self.num_fix_combinations = tf.placeholder(dtype=tf.int32, shape=[], name="num_fix_combinations")
+            self.num_cur_fields = tf.placeholder(dtype=tf.int32, shape=[], name="num_cur_fields")
+            self.fix_combinations = tf.cast(tf.placeholder(dtype=tf.int32, shape=[None, None, Config.num_fields]),
+                                            name="fix_combinations", dtype=tf.float32)
+            self.cur_combination = tf.cast(tf.placeholder(dtype=tf.int32, shape=[None, Config.num_fields]), name="cur_combination",
+                                           dtype=tf.float32)
             self.action = tf.placeholder(dtype=tf.int32, shape=[None], name="action")
             self.target = tf.placeholder(dtype=tf.float32, shape=[None], name="target")
 
     def define_encoder(self, encode_dim):
         with tf.variable_scope("encoder"):
-            self.encoder_w = w = tf.get_variable("w", shape=[Config.num_fields, encode_dim], dtype=tf.float32, initializer=get_initializer("xavier"))
+            self.encoder_w = w = tf.get_variable("w", shape=[Config.num_fields, encode_dim], dtype=tf.float32,
+                                                 initializer=get_initializer("xavier"))
             self.fix_encoded = tf.sigmoid(tf.tensordot(self.fix_combinations, w, 1), name="fix_encoded")  # batch * fix_num * encode_dim
             self.cur_encoded = tf.sigmoid(tf.tensordot(self.cur_combination, w, 1), name="cur_encoded")  # batch * encode_dim
 
@@ -73,19 +96,14 @@ class Actor:
                     cur_layer = get_activation(layer_param)(cur_layer)
                 else:
                     raise ValueError
-            self.logits = cur_layer
+            self.logits = tf.reshape(tf.boolean_mask(cur_layer, tf.equal(self.cur_combination, 0)),
+                                     shape=[-1, Config.num_fields - self.num_cur_fields], name="logits")
             self.action_probs = tf.nn.softmax(self.logits)
 
     def define_loss_and_train(self):
-        self.loss = self.target * tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.action, logits=self.logits)
+        self.loss = tf.reduce_mean(self.target * tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.action, logits=self.logits),
+                                   name="loss")
         self.train_op = self.optimizer.minimize(self.loss)
-#        batch_size = tf.shape(self.cur_combination)[0]
-#        seq = tf.expand_dims(tf.range(start=0, limit=batch_size, dtype=tf.int32), axis=1)
-#        positions = tf.concat([seq, tf.expand_dims(self.action, axis=1)], axis=1)  # batch * 2
-#        probs = tf.gather_nd(self.action_probs, positions)  # batch
-#        self.loss = tf.reduce_mean(self.target * (-tf.log(probs)))
-#       self.loss = tf.reduce_mean(self.target * tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.action, logits=self.logits, name="loss"))
-#        self.train_op = self.optimizer.minimize(self.loss)
 
     def watch(self, fetches, feed_dict):
         return self.sess.run(fetches=fetches, feed_dict=feed_dict)
@@ -98,18 +116,19 @@ class Actor:
         fix_combs = state.fix_combinations[np.newaxis, :, :]
         cur_combs = state.cur_combination[np.newaxis, :]
         fetches = [self.action_probs, self.logits]
-        feed_dict = {self.fix_combinations: fix_combs, self.cur_combination: cur_combs}
-        aprobs, logits = self.sess.run(fetches=fetches, feed_dict=feed_dict)
-        debug_fetches = [self.fix_combinations, self.cur_combination, self.encoder_w, self.fix_combined, self.cur_encoded, self.logits, self.action_probs]
-        print("fix_combinations:\n{}\ncur_combination:\n{}\nencoder/w:\n{}\nfix_combined:\n{}\ncur_encoded:\n{}\nlogits:\n{}\naction_probs:\n{}".format(*self.watch(debug_fetches, feed_dict=feed_dict)))
-        return aprobs, logits
+        feed_dict = {self.num_cur_fields: np.sum(state.cur_combination), self.fix_combinations: fix_combs, self.cur_combination: cur_combs}
+        action_probs, logits = self.sess.run(fetches=fetches, feed_dict=feed_dict)
+#        debug_fetches = [self.fix_combinations, self.cur_combination, self.encoder_w, self.fix_combined, self.cur_encoded, self.logits, self.action_probs]
+#        print("fix_combinations:\n{}\ncur_combination:\n{}\nencoder/w:\n{}\nfix_combined:\n{}\ncur_encoded:\n{}\nlogits:\n{}\naction_probs:\n{}".format(*self.watch(debug_fetches, feed_dict=feed_dict)))
+        return action_probs, logits
 
     def update(self, fix_combs, cur_combs, target, action):
         """
         update the network and return the loss
         """
         fetches = [self.loss, self.train_op]
-        feed_dict = {self.fix_combinations: fix_combs,
+        feed_dict = {self.num_cur_fields: np.sum(cur_combs[0]),
+                     self.fix_combinations: fix_combs,
                      self.cur_combination: cur_combs,
                      self.action: action,
                      self.target: target}
