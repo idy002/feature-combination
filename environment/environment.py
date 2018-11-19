@@ -40,12 +40,13 @@ class Enviroment:
             cur_comb = np.zeros_like(cur_comb)
         next_state = State(fix_combs, cur_comb)
         if np.sum(cur_comb) == 0:
-            reward = self.evaluator.score(next_state.fix_combinations[1:], True) \
-                     - self.evaluator.score(next_state.fix_combinations[1:-1], False)
+            new_score, auc = self.evaluator.score(next_state.fix_combinations[1:], True)
+            old_score, _ = self.evaluator.score(next_state.fix_combinations[1:-1], False)
+            reward = new_score - old_score
         else:
-            reward = 0.0
+            reward, auc = 0.0, 0.0
         hasStop = (fix_combs.shape[0] >= Config.environment_combinations_num)
-        return hasStop, next_state, reward
+        return hasStop, next_state, reward, auc
 
 
 

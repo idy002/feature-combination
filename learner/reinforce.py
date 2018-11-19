@@ -7,7 +7,7 @@ from environment.environment import Enviroment
 from learner.actor import State
 from config import Config
 
-EpisodeData = namedtuple('EpisodeData', ['fix_combs', 'cur_combs', 'actions', 'rewards', 'discounted_rewards'])
+EpisodeData = namedtuple('EpisodeData', ['fix_combs', 'cur_combs', 'actions', 'rewards', 'discounted_rewards', 'auc'])
 ClassifiedData = namedtuple('ClassifiedData', ['fix_combs', 'cur_combs', 'actions', 'discounted_rewards'])
 
 
@@ -84,17 +84,19 @@ class Reinforce:
                 episode_data_list = []
                 for i_episode in range(batch_size):
                     state = env.reset()
-                    episode_data = EpisodeData([], [], [], [], [])  # episode data
+                    episode_data = EpisodeData([], [], [], [], [], [])  # episode data
+                    auc_list = []
                     while True:
                         probs, logits = self.actor.predict(state)
                         action = self.sample_action(state, probs[0])
 
-                        done, next_state, reward = env.step(state, action)
+                        done, next_state, reward, auc = env.step(state, action)
 
                         episode_data.fix_combs.append(state.fix_combinations)
                         episode_data.cur_combs.append(state.cur_combination)
                         episode_data.actions.append(action)
                         episode_data.rewards.append(reward)
+                        episode_data.auc.append(auc)
 
                         state = next_state
                         if done:
@@ -105,8 +107,6 @@ class Reinforce:
                         episode_data.discounted_rewards[i] += episode_data.discounted_rewards[i + 1] * discount_factor
                     episode_data_list.append(episode_data)
                     #  do summary
-                    self.writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='reward', simple_value=reward)]),
-                                            global_step=global_episode_index)
                     print("Episode {}, Accumulated Reward {:.3f}".format(global_episode_index, episode_data.discounted_rewards[0]))
                     print("Selected Field Combinations:\n{}".format(state.fix_combinations))
                     global_episode_index += 1
@@ -118,6 +118,12 @@ class Reinforce:
                                              classified_data.discounted_rewards, classified_data.actions)
                     losses.append(loss)
                 mean_loss = np.mean(losses)
+                self.writer.add_summary(tf.Summary(value=[ tf.Summary.Value(tag='Score',
+                                        simple_value=np.mean([episode_data.discounted_rewards[0] for episode_data in episode_data_list]))]),
+                                        global_step=global_episode_index)
+                self.writer.add_summary(tf.Summary(value=[ tf.Summary.Value(tag='Auc',
+                                        simple_value=np.mean([episode_data.auc[-1] for episode_data in episode_data_list]))]),
+                                        global_step=global_episode_index)
                 self.writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='loss', simple_value=mean_loss)]),
                                         global_step=global_episode_index)
                 print("Batch {}, Loss {:.3f}".format(i_batch, mean_loss))

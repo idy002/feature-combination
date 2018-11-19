@@ -71,8 +71,10 @@ class Actor:
         with tf.variable_scope("encoder"):
             self.encoder_w = w = tf.get_variable("w", shape=[Config.num_fields, encode_dim], dtype=tf.float32,
                                                  initializer=get_initializer("xavier"))
-            self.fix_encoded = tf.sigmoid(tf.tensordot(self.fix_combinations, w, 1), name="fix_encoded")  # batch * fix_num * encode_dim
-            self.cur_encoded = tf.sigmoid(tf.tensordot(self.cur_combination, w, 1), name="cur_encoded")  # batch * encode_dim
+#            self.fix_encoded = tf.sigmoid(tf.tensordot(self.fix_combinations, w, 1), name="fix_encoded")  # batch * fix_num * encode_dim
+#            self.cur_encoded = tf.sigmoid(tf.tensordot(self.cur_combination, w, 1), name="cur_encoded")  # batch * encode_dim
+            self.fix_encoded = tf.tensordot(self.fix_combinations, w, 1, name="fix_encoded")  # batch * fix_num * encode_dim
+            self.cur_encoded = tf.tensordot(self.cur_combination, w, 1, name="cur_encoded")  # batch * encode_dim
 
     def define_combinator(self):
         with tf.variable_scope("combinator"):

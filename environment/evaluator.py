@@ -80,9 +80,9 @@ class Evaluator:
             self.train_op = self.optimizer.minimize(self.model.loss, global_step=self.global_step)
             self.saver = tf.train.Saver()
             if self.render:
-                self.train_writer = tf.summary.FileWriter(Config.evaluator_train_logdir, graph=self.graph, flush_secs=10.0)
-                self.valid_writer = tf.summary.FileWriter(Config.evaluator_valid_logdir, graph=self.graph, flush_secs=10.0)
-                graph_writer = tf.summary.FileWriter(Config.evaluator_graph_logdir, graph=self.graph, flush_secs=10.0)
+                self.train_writer = tf.summary.FileWriter(Config.evaluator_train_logdir, graph=self.graph)
+                self.valid_writer = tf.summary.FileWriter(Config.evaluator_valid_logdir, graph=self.graph)
+                graph_writer = tf.summary.FileWriter(Config.evaluator_graph_logdir, graph=self.graph)
                 graph_writer.close()
 
     def init_dataset(self, state):
@@ -153,7 +153,7 @@ class Evaluator:
             self.sess.run(tf.global_variables_initializer())
             self.start_time = time.time()
             all_auc = []
-            while round < max_rounds:
+            while True:
                 for batch_xs, batch_ys in self.train_gen:
                     loss, log_loss, l2_loss = self.train_batch(batch_xs, batch_ys)
                     step = self.sess.run(self.global_step)
@@ -171,8 +171,9 @@ class Evaluator:
                               .format(round, self.get_elapsed(), log_loss, auc))
                     all_auc.append(auc)
                     max_auc = max(all_auc)
-                    if max(all_auc[-early_stop_rounds:]) < max_auc:
-                        return max(all_auc[-early_stop_rounds:])
+                    recent_max = max(all_auc[-early_stop_rounds:])
+                    if recent_max < max_auc or recent_max >= 1 - 5e-3:
+                        return recent_max
                 round += 1
 
     def evaluate_batch(self, batch_xs, batch_ys):
@@ -200,13 +201,11 @@ class Evaluator:
     def score(self, state, render=False):
         state_list_type = tuple([tuple(a) for a in state.tolist()])
         if state.shape[0] == 0:
-            return 0.0
-        if render:
-            print("Scoring:\n{}".format(state))
+            return 0.0, 0.0
         if state_list_type in self.cache:
-            scr = self.cache[state_list_type]
+            scr, auc = self.cache[state_list_type]
         else:
-            self.render = render
+            self.render = render and False
             self.init_dataset(state)
             self.build_graph()
             auc = self.train(state,
@@ -214,14 +213,14 @@ class Evaluator:
                              log_step_frequency=Config.evaluator_log_step_frequency,
                              eval_round_frequency=Config.evaluator_eval_round_frequency,
                              early_stop_rounds=Config.evaluator_early_stop,
-                             render=render)
+                             render=self.render)
             scr = np.tan(auc)
-            self.cache[state_list_type] = scr
+            self.cache[state_list_type] = scr, auc
             if len(self.cache) > 20:
                 self.cache.popitem()
         if render:
-            print("Score:{:.3f}\n".format(scr))
-        return scr
+            print("Phase: {}  Score: {:.3f}  Auc: {:.3f}".format(state.shape[0], scr, auc))
+        return scr, auc
 
 
 if __name__ == "__main__":

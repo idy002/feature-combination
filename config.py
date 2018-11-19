@@ -37,11 +37,11 @@ class Config:
     #
     #   encoder config
     #
-    encoder_dim = 1024
+    encoder_dim = 128
 
     #
     #   reinforce config
-    reinforce_logdir = "./summaries/reinforce_graph"
+    reinforce_logdir = "./summaries/reinforce_logdir"
     reinforce_learning_rate = 0.001
 
 
