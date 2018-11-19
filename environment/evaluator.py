@@ -201,9 +201,10 @@ class Evaluator:
         state_list_type = tuple([tuple(a) for a in state.tolist()])
         if state.shape[0] == 0:
             return 0.0
-        print("Scoring:\n{}".format(state))
+        if render:
+            print("Scoring:\n{}".format(state))
         if state_list_type in self.cache:
-            auc = self.cache[state_list_type]
+            scr = self.cache[state_list_type]
         else:
             self.render = render
             self.init_dataset(state)
@@ -214,11 +215,13 @@ class Evaluator:
                              eval_round_frequency=Config.evaluator_eval_round_frequency,
                              early_stop_rounds=Config.evaluator_early_stop,
                              render=render)
-            self.cache[state_list_type] = auc
+            scr = np.tan(auc)
+            self.cache[state_list_type] = scr
             if len(self.cache) > 20:
                 self.cache.popitem()
-        print("Return:{:.3f}\n".format(auc))
-        return auc
+        if render:
+            print("Score:{:.3f}\n".format(scr))
+        return scr
 
 
 if __name__ == "__main__":

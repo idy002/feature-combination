@@ -15,7 +15,7 @@ class Reinforce:
     def __init__(self, learning_rate):
         # model
         self.graph = tf.Graph()
-        self.sess = tf.Session(graph=self.graph)
+        self.sess = tf.Session(graph=self.graph, config=Config.sess_config)
         self.writer = tf.summary.FileWriter(Config.reinforce_logdir, graph=self.graph)
         self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         with self.graph.as_default():
