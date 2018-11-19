@@ -8,9 +8,9 @@ import sys
 import json
 
 size_data = int(sys.argv[1]) if int(sys.argv[1]) != -1 else 10000
-num_fc = 20
-lens_fc = [ 3, 4, 5, 6, 7 ]
-fields = [2, 2, 3, 3, 5, 5, 10, 10, 10, 50, 100, 500, 1000]
+num_fc = 10
+lens_fc = [ 2, 3, 4, 5, 6 ]
+fields = [2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5]
 max_repeat = 1
 
 all_fc = []
