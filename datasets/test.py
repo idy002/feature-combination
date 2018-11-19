@@ -1,5 +1,4 @@
-
-from datasets import Couple
+import Couple
 
 couple = Couple()
 couple.summary()

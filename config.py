@@ -50,8 +50,11 @@ class Config:
     #
     evaluator_model_name = "lr"  #  'pin', 'lr'
     evaluator_optimizer_name = 'adam'
-    evaluator_learning_rate = 0.01
-    evaluator_epsilon = 1e-5
+    evaluator_learning_rate = 0.1
+    evaluator_epsilon = 1e-4
+    evaluator_early_stop = 10
+    evaluator_log_step_frequency = 0
+    evaluator_eval_round_frequency = 1
     evaluator_train_logdir = "./summaries/evaluator_train"
     evaluator_valid_logdir = "./summaries/evaluator_valid"
     evaluator_graph_logdir = "./summaries/evaluator_graph"

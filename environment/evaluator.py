@@ -15,16 +15,25 @@ class StateDatasetIterator:
     def __init__(self, evaluator, kwargs):
         self.evaluator = evaluator
         self.kwargs = kwargs
+        self.data = None
+        if not kwargs["on_disk"]:
+            self.data = []
+            for batch_xs, batch_ys in Config.dataset.batch_generator(kwargs=self.kwargs):
+                self.data.append((self.evaluator.transformX(batch_xs), batch_ys))
 
     def __iter__(self):
-        for batch_xs, batch_ys in Config.dataset.batch_generator(kwargs=self.kwargs):
-            yield self.evaluator.transformX(batch_xs), batch_ys
-
+        if self.kwargs["on_disk"]:
+            for batch_xs, batch_ys in Config.dataset.batch_generator(kwargs=self.kwargs):
+                yield self.evaluator.transformX(batch_xs), batch_ys
+        else:
+            for batch_xs, batch_ys in self.data:
+                yield batch_xs, batch_ys
 
 class Evaluator:
     def __init__(self):
         # general
         self.render = None
+        self.cache = dict()
 
         # raw dataset information
         self.raw_feat_sizes = Config.dataset.feat_sizes
@@ -91,8 +100,8 @@ class Evaluator:
             cur_index += size
         self.num_features = cur_index
         self.num_fields = state.shape[0]
-        self.train_gen = self.batch_generator(gen_type="train", batch_size=100)
-        self.valid_gen = self.batch_generator(gen_type="valid", batch_size=100)
+        self.train_gen = self.batch_generator(gen_type="train", batch_size=10000)
+        self.valid_gen = self.batch_generator(gen_type="valid", batch_size=10000)
 
     def print_datainfo(self):
         print("state:")
@@ -133,25 +142,22 @@ class Evaluator:
     def get_elapsed(self):
         return time.time() - self.start_time
 
-    def train(self, state, max_rounds=100, log_step_frequency=10, eval_round_frequency=1, early_stop_rounds=3,
+    def train(self, state, max_rounds, log_step_frequency, eval_round_frequency, early_stop_rounds,
               render=True):
         """
         train the model given the specified state, use auc as the performance.
         """
         with self.graph.as_default():
             self.train_gen = self.batch_generator(gen_type="train", batch_size=1000)
-            step = 0
             round = 0
             self.sess.run(tf.global_variables_initializer())
             self.start_time = time.time()
             all_auc = []
             while round < max_rounds:
-                if render:
-                    print("Round: {}".format(step))
                 for batch_xs, batch_ys in self.train_gen:
                     loss, log_loss, l2_loss = self.train_batch(batch_xs, batch_ys)
                     step = self.sess.run(self.global_step)
-                    if render and step % log_step_frequency == 0:
+                    if render and log_step_frequency > 0 and step % log_step_frequency == 0:
                         print("Done step {:2d}, Elapsed: {:.3f} seconds, Loss: {:.3f}, Log-Loss: {:.3f}, L2-Loss: {:.3f}"
                               .format(step, self.get_elapsed(), loss, log_loss, l2_loss))
                         summary = tf.Summary(value=[tf.Summary.Value(tag='loss', simple_value=loss),
@@ -166,7 +172,7 @@ class Evaluator:
                     all_auc.append(auc)
                     max_auc = max(all_auc)
                     if max(all_auc[-early_stop_rounds:]) < max_auc:
-                        return
+                        return max(all_auc[-early_stop_rounds:])
                 round += 1
 
     def evaluate_batch(self, batch_xs, batch_ys):
@@ -192,12 +198,26 @@ class Evaluator:
         return log_loss, auc
 
     def score(self, state, render=False):
-        self.render = render
-        self.init_dataset(state)
-        self.build_graph()
-        self.train(state, max_rounds=300, log_step_frequency=10, eval_round_frequency=1, early_stop_rounds=3,
-                   render=render)
-        log_loss, auc = self.evaluate(self.valid_gen, self.valid_writer)
+        state_list_type = tuple([tuple(a) for a in state.tolist()])
+        if state.shape[0] == 0:
+            return 0.0
+        print("Scoring:\n{}".format(state))
+        if state_list_type in self.cache:
+            auc = self.cache[state_list_type]
+        else:
+            self.render = render
+            self.init_dataset(state)
+            self.build_graph()
+            auc = self.train(state,
+                             max_rounds=300,
+                             log_step_frequency=Config.evaluator_log_step_frequency,
+                             eval_round_frequency=Config.evaluator_eval_round_frequency,
+                             early_stop_rounds=Config.evaluator_early_stop,
+                             render=render)
+            self.cache[state_list_type] = auc
+            if len(self.cache) > 20:
+                self.cache.popitem()
+        print("Return:{:.3f}\n".format(auc))
         return auc
 
 

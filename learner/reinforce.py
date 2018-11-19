@@ -107,7 +107,7 @@ class Reinforce:
                     #  do summary
                     self.writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='reward', simple_value=reward)]),
                                             global_step=global_episode_index)
-                    print("Episode {}, Reward {:.3f}".format(global_episode_index, reward))
+                    print("Episode {}, Accumulated Reward {:.3f}".format(global_episode_index, episode_data.discounted_rewards[0]))
                     print("Selected Field Combinations:\n{}".format(state.fix_combinations))
                     global_episode_index += 1
                 #   update
