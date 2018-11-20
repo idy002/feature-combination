@@ -153,7 +153,7 @@ class Evaluator:
             self.sess.run(tf.global_variables_initializer())
             self.start_time = time.time()
             all_auc = []
-            while True:
+            while round < max_rounds:
                 for batch_xs, batch_ys in self.train_gen:
                     loss, log_loss, l2_loss = self.train_batch(batch_xs, batch_ys)
                     step = self.sess.run(self.global_step)
@@ -209,7 +209,7 @@ class Evaluator:
             self.init_dataset(state)
             self.build_graph()
             auc = self.train(state,
-                             max_rounds=300,
+                             max_rounds=1000,
                              log_step_frequency=Config.evaluator_log_step_frequency,
                              eval_round_frequency=Config.evaluator_eval_round_frequency,
                              early_stop_rounds=Config.evaluator_early_stop,
