@@ -175,6 +175,7 @@ class Evaluator:
                     if recent_max < max_auc or recent_max >= 1 - 5e-3:
                         return recent_max
                 round += 1
+            return max(all_auc)
 
     def evaluate_batch(self, batch_xs, batch_ys):
         fetches = self.model.preds
@@ -209,17 +210,15 @@ class Evaluator:
             self.init_dataset(state)
             self.build_graph()
             auc = self.train(state,
-                             max_rounds=1000,
+                             max_rounds=Config.evaluator_max_rounds,
                              log_step_frequency=Config.evaluator_log_step_frequency,
                              eval_round_frequency=Config.evaluator_eval_round_frequency,
                              early_stop_rounds=Config.evaluator_early_stop,
                              render=self.render)
             scr = np.tan(auc)
+            if len(self.cache) > 10000:
+                self.cache.clear()
             self.cache[state_list_type] = scr, auc
-            if len(self.cache) > 20:
-                self.cache.popitem()
-        if render:
-            print("Phase: {}  Score: {:.3f}  Auc: {:.3f}".format(state.shape[0], scr, auc))
         return scr, auc
 
 

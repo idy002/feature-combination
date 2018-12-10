@@ -37,7 +37,7 @@ class Config:
     #
     #   encoder config
     #
-    encoder_dim = 128
+    encoder_dim = 64
 
     #
     #   reinforce config
@@ -50,9 +50,10 @@ class Config:
     #
     evaluator_model_name = "lr"  #  'pin', 'lr'
     evaluator_optimizer_name = 'adam'
-    evaluator_learning_rate = 0.1
+    evaluator_learning_rate = 0.03
     evaluator_epsilon = 1e-4
-    evaluator_early_stop = 10
+    evaluator_max_rounds = 2000
+    evaluator_early_stop = 8
     evaluator_log_step_frequency = 0
     evaluator_eval_round_frequency = 1
     evaluator_train_logdir = "./summaries/evaluator_train"

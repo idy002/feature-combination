@@ -52,7 +52,7 @@ class Actor:
             self.define_combinator()
 
             self.chooser_input = tf.concat([self.fix_combined, self.cur_encoded], axis=1)
-            self.define_chooser([('full', 1024), ('act', 'relu'), ('full', 128), ('act', 'relu'), ('full', Config.num_fields)])
+            self.define_chooser([('full', 256), ('act', 'relu'), ('full',64), ('act', 'relu'), ('full', Config.num_fields)])
 
             self.define_loss_and_train()
 

@@ -234,7 +234,7 @@ class Dataset:
 
         def _iter_():
             if on_disk:
-                #print('on disk...')
+                # print('on disk...')
                 for hdf_in, hdf_out in self._files_iter_(gen_type=gen_type, shuffle_block=shuffle_block):
                     with pd.HDFStore(hdf_in, mode='r') as hdf_in, pd.HDFStore(hdf_out, mode='r') as hdf_out:
                         num_lines = hdf_in.get_storer('fixed').shape[0]
@@ -256,7 +256,7 @@ class Dataset:
                         y_all = pd.read_hdf(hdf_out, mode='r', start=start, stop=stop).values
                         yield X_all, y_all, hdf_in
             else:
-                #print('in mem...')
+                # print('in mem...')
                 self.load_data(gen_type=gen_type, num_workers=num_workers, task_index=task_index)
                 if gen_type == 'train' or gen_type == 'valid':
                     sep = int(len(self.X_train) * val_ratio)

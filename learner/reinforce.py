@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import sys
+import time
 from collections import namedtuple
 from learner.actor import Actor
 from environment.environment import Enviroment
@@ -75,8 +76,14 @@ class Reinforce:
                 ))
         return result
 
+    @staticmethod
+    def get_elapsed_time(start_time):
+        t = time.gmtime(time.time() - start_time)
+        return "{hours:02}:{minutes:02}:{seconds:02}".format(hours=(t.tm_yday-1) * 24 + t.tm_hour, minutes=t.tm_min, seconds=t.tm_sec)
+
     def train(self, env, num_batches, batch_size, discount_factor=1.0):
         global_episode_index = 0
+        start_time = time.time()
         with self.graph.as_default():
             self.sess.run(tf.global_variables_initializer())
             for i_batch in range(num_batches):
@@ -91,6 +98,10 @@ class Reinforce:
                         action = self.sample_action(state, probs[0])
 
                         done, next_state, reward, auc = env.step(state, action)
+
+                        if np.sum(next_state.cur_combination) == 0:
+                            print("\tPhase: {}  Elapsed: {}  Reward: {:.3f}  Auc: {:.3f}".format(next_state.fix_combinations.shape[0],
+                                                                                             self.get_elapsed_time(start_time), reward, auc))
 
                         episode_data.fix_combs.append(state.fix_combinations)
                         episode_data.cur_combs.append(state.cur_combination)
@@ -107,8 +118,12 @@ class Reinforce:
                         episode_data.discounted_rewards[i] += episode_data.discounted_rewards[i + 1] * discount_factor
                     episode_data_list.append(episode_data)
                     #  do summary
-                    print("Episode {}, Accumulated Reward {:.3f}".format(global_episode_index, episode_data.discounted_rewards[0]))
-                    print("Selected Field Combinations:\n{}".format(state.fix_combinations))
+#                    print("Auc: {}".format(episode_data.auc))
+#                    print("Rewards: {}".format(episode_data.rewards))
+#                    print("Discounted Rewards: {}".format(episode_data.discounted_rewards))
+#                    print("Reward Sum:{},  First Discounted Reward{}".format(np.sum(episode_data.rewards), episode_data.discounted_rewards[0]))
+                    print("Batch: {}  Episode {}  Elapsed: {}  Accumulated Reward {:.3f}".format(i_batch, global_episode_index, time.time() - start_time, episode_data.discounted_rewards[0]))
+                    print("Selected Field Combinations:\n{}".format(state.fix_combinations[1:]))
                     global_episode_index += 1
                 #   update
                 classified_data_list = self.trans_data(episode_data_list)
