@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from environment.evaluator import Evaluator
+from environment.old_evaluator import Evaluator
 from learner.actor import State
 
 from config import Config
@@ -28,10 +28,10 @@ class Enviroment:
                     return
 
 
-    '''
-    @:return hasStop, next_state, reward
-    '''
     def step(self, state, action):
+        """
+        @:return hasStop, next_state, reward
+        """
         fix_combs, cur_comb = np.array(state.fix_combinations), np.array(state.cur_combination)
 
         Enviroment.do_action(cur_comb, action)

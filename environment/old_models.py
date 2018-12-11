@@ -19,7 +19,6 @@ def as_model(model_name, **model_param):
     return model_map[model_name](**model_param)
 
 
-
 class Model:
     def __init__(self, input_dim, num_fields, output_dim=1):
         self.inputs = None
@@ -50,32 +49,29 @@ class Model:
             num_params += functools.reduce(operator.mul, [dim.value for dim in shape], 1)
         return num_params
 
-    '''
-    define self.inputs, self.labels and self.training
-    '''
-
     def define_placeholder(self):
+        """
+        define self.inputs, self.labels and self.training
+        """
         with tf.variable_scope("input"):
             self.inputs = tf.placeholder(tf.int32, shape=[None, self.num_fields], name="inputs")  # batch * input_dim
             self.labels = tf.placeholder(tf.float32, shape=[None, self.output_dim], name="labels")  # batch * 1
             self.training = tf.placeholder(tf.bool, name="training")
 
-    '''
-    self.inputs --> self.embed
-    '''
-
     def define_embedding(self, embed_size):
+        """
+        self.inputs --> self.embed
+        """
         with tf.variable_scope("embedding"):
             initializer = get_initializer(init_type="xavier")
             w = tf.get_variable("w", shape=[self.input_dim, embed_size], dtype=tf.float32, initializer=initializer,
                                 collections=EMBEDS)
             self.embed = tf.nn.embedding_lookup(w, self.inputs)  # batch * fields * embed_size
 
-    '''
-    self.embed --> self.pair
-    '''
-
     def define_unroll(self, product_flag):
+        """
+        self.embed --> self.pair
+        """
         p_indices = []
         q_indices = []
         for i in range(self.num_fields):
@@ -94,11 +90,10 @@ class Model:
             else:
                 self.pair = tf.concat([p_pair, q_pair], axis=2)  # batch * pair * 3 embed_size
 
-    '''
-    self.sub_nn_inputs --> self.sub_nn_outputs
-    '''
-
     def define_sub_nn(self, sub_nn_layers):
+        """
+        self.sub_nn_inputs --> self.sub_nn_outputs
+        """
         with tf.variable_scope("sub_nn"):
             cur_dim = self.sub_nn_inputs.get_shape().as_list()[-1]
             cur_num = self.sub_nn_inputs.get_shape().as_list()[-2]
@@ -122,11 +117,10 @@ class Model:
                     raise ValueError
             self.sub_nn_outputs = tf.transpose(cur_layer, [1, 0, 2])
 
-    '''
-    self.nn_inputs --> self.nn_outputs
-    '''
-
     def define_nn(self, nn_layers):
+        """
+        self.nn_inputs --> self.nn_outputs
+        """
         with tf.variable_scope("nn"):
             cur_dim = self.nn_inputs.get_shape().as_list()[-1]
             cur_layer = self.nn_inputs  # batch * cur_dim
@@ -151,11 +145,10 @@ class Model:
                     raise ValueError
             self.nn_outputs = cur_layer
 
-    '''
-    self.logits --> self.log_loss, self.l2_loss, self.loss
-    '''
-
     def define_loss(self, l2_embed=None, l2_subnn=None, l2_nn=None, l2_bias=None):
+        """
+        self.logits --> self.log_loss, self.l2_loss, self.loss
+        """
         with tf.variable_scope("loss"):
             l2_items = [(l2_embed, 'EMBEDS'), (l2_subnn, 'SUB_NN_WEIGHTS'), (l2_nn, 'NN_WEIGHTS'), (l2_bias, 'BIASES')]
             l2_losses = []
@@ -190,7 +183,6 @@ class LR(Model):
             self.preds = tf.sigmoid(self.logits)
 
             self.define_loss(l2_embed=0.01, l2_bias=0.01)
-
 
 
 class PIN(Model):

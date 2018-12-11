@@ -120,8 +120,6 @@ class Actor:
         fetches = [self.action_probs, self.logits]
         feed_dict = {self.num_cur_fields: np.sum(state.cur_combination), self.fix_combinations: fix_combs, self.cur_combination: cur_combs}
         action_probs, logits = self.sess.run(fetches=fetches, feed_dict=feed_dict)
-#        debug_fetches = [self.fix_combinations, self.cur_combination, self.encoder_w, self.fix_combined, self.cur_encoded, self.logits, self.action_probs]
-#        print("fix_combinations:\n{}\ncur_combination:\n{}\nencoder/w:\n{}\nfix_combined:\n{}\ncur_encoded:\n{}\nlogits:\n{}\naction_probs:\n{}".format(*self.watch(debug_fetches, feed_dict=feed_dict)))
         return action_probs, logits
 
     def update(self, fix_combs, cur_combs, target, action):

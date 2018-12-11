@@ -54,6 +54,7 @@ class Config:
     evaluator_epsilon = 1e-4
     evaluator_max_rounds = 2000
     evaluator_early_stop = 8
+    evaluator_embedding_size = 8
     evaluator_log_step_frequency = 0
     evaluator_eval_round_frequency = 1
     evaluator_train_logdir = "./summaries/evaluator_train"
@@ -66,8 +67,11 @@ class Config:
     #
     data_name = "Couple"
     dataset = as_dataset(data_name, False)
+    dataset.load_data(gen_type='train')
+    dataset.load_data(gen_type='test')
     dataset.summary()
     num_fields = dataset.num_fields
-    meta = dataset.meta
-    target_combination_num = len(meta["field_combinations"])
-    target_combination_len = meta["lens_fc"][0]
+    feat_sizes = dataset.feat_sizes
+    feat_min = dataset.feat_min
+    target_combination_num = 10
+    target_combination_len = 3
