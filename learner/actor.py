@@ -2,9 +2,9 @@ import tensorflow as tf
 import numpy as np
 import collections
 from config import Config
-from common import get_initializer, get_activation
+from utility import get_initializer, get_activation
 
-State = collections.namedtuple('State', ['fix_combinations', 'cur_combination'])
+State = collections.namedtuple('State', ['fix_combinations', 'cur_combination', 'score'])
 
 
 class Actor:

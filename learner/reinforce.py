@@ -119,8 +119,8 @@ class Reinforce:
                     episode_data_list.append(episode_data)
                     #  do summary
 #                    print("Auc: {}".format(episode_data.auc))
-#                    print("Rewards: {}".format(episode_data.rewards))
-#                    print("Discounted Rewards: {}".format(episode_data.discounted_rewards))
+                    print("Rewards: {}".format(episode_data.rewards))
+                    print("Discounted Rewards: {}".format(episode_data.discounted_rewards))
 #                    print("Reward Sum:{},  First Discounted Reward{}".format(np.sum(episode_data.rewards), episode_data.discounted_rewards[0]))
                     print("Batch: {}  Episode {}  Elapsed: {}  Accumulated Reward {:.3f}".format(i_batch, global_episode_index, time.time() - start_time, episode_data.discounted_rewards[0]))
                     print("Selected Field Combinations:\n{}".format(state.fix_combinations[1:]))

@@ -1,7 +1,7 @@
 import tensorflow as tf
 import operator
 import functools
-from common import get_initializer, get_activation
+from utility import get_initializer, get_activation
 
 WEIGHTS = [tf.GraphKeys.GLOBAL_VARIABLES, tf.GraphKeys.WEIGHTS]
 EMBEDS = WEIGHTS + ["EMBEDS"]

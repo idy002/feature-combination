@@ -1,7 +1,7 @@
 from config import Config
 import sys
 from environment.old_models import as_model
-from common import get_optimizer
+from utility import get_optimizer
 import time
 import sklearn
 import random

@@ -102,9 +102,9 @@ class Dataset:
         print('Transferring feature', file_prefix, 'data into hdf data and save hdf', file_prefix, 'data...')
         for idx in range(num_of_parts):
             _X = pd.read_csv(os.path.join(feature_data_dir, file_prefix + '_input.part_' + str(idx)),
-                             dtype=np.int32, delimiter=',', header=None)
+                             dtype=np.int32, delimiter=' ', header=None)
             _y = pd.read_csv(os.path.join(feature_data_dir, file_prefix + '_output.part_' + str(idx)),
-                             dtype=np.int32, delimiter=',', header=None)
+                             dtype=np.int32, delimiter=' ', header=None)
             _X.to_hdf(os.path.join(hdf_data_dir, file_prefix + '_input_part_' + str(idx) + '.h5'), 'fixed')
             _y.to_hdf(os.path.join(hdf_data_dir, file_prefix + '_output_part_' + str(idx) + '.h5'), 'fixed')
             print('part:', idx, _X.shape, _y.shape)

@@ -11,6 +11,7 @@ from config import Config
 
 
 def main():
+    env = Enviroment()
     reinforce = Reinforce(learning_rate=0.001)
     reinforce.train(env, num_batches=5000, batch_size=3, discount_factor=1.0)
 
