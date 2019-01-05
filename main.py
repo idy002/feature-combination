@@ -6,7 +6,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = '3'  # only show warning and error
 
 # from old_reinforce import Reinforce
 from learner.reinforce import Reinforce
-from environment.environment import Enviroment
+from environment.env import Enviroment
 from config import Config
 
 

@@ -69,7 +69,7 @@ class Config:
     #
     #   dataset
     #
-    data_name = "ml1m"
+    data_name = "Couple"
     dataset = as_dataset(data_name, True)
     dataset.load_data(gen_type='train')
     dataset.load_data(gen_type='test')

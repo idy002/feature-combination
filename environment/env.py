@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
 #from environment.old_evaluator import Evaluator
-from environment.keras_evaluator import Evaluator
+#from environment.keras_evaluator import Evaluator
+from environment.evaluator import Evaluator
 from learner.actor import State
 
 from config import Config

@@ -4,7 +4,7 @@ import sys
 import time
 from collections import namedtuple
 from learner.actor import Actor
-from environment.environment import Enviroment
+from environment.env import Enviroment
 from learner.actor import State
 from config import Config
 
