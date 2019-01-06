@@ -2,6 +2,9 @@
   <dictionary name="yyding">
     <words>
       <w>embeded</w>
+      <w>fcomb</w>
+      <w>logits</w>
+      <w>preds</w>
       <w>relu</w>
     </words>
   </dictionary>
